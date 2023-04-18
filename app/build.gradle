@@ -1,0 +1,88 @@
+plugins {
+    id 'com.android.application'
+}
+
+android {
+    namespace 'com.virtual.app'
+    compileSdk 33
+
+    defaultConfig {
+        applicationId "com.virtual.app"
+        minSdk 24
+        targetSdk 33
+        versionCode 1
+        versionName "1.0"
+
+    }
+
+    buildTypes {
+        release {
+
+        }
+    }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+
+    signingConfigs {
+        debug {
+            storeFile file("${projectDir}${File.separator}virtual_app.jks")
+            storePassword 'virtual_app'
+            keyAlias = 'virtual_app'
+            keyPassword 'virtual_app'
+        }
+        release {
+            storeFile file("${projectDir}${File.separator}virtual_app.jks")
+            storePassword 'virtual_app'
+            keyAlias = 'virtual_app'
+            keyPassword 'virtual_app'
+        }
+    }
+
+    buildTypes {
+        release {
+            shrinkResources true
+            minifyEnabled true
+            zipAlignEnabled true
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            signingConfig signingConfigs.release
+        }
+
+        debug {
+            signingConfig signingConfigs.debug
+        }
+    }
+
+    applicationVariants.all { variant ->
+        variant.outputs.all { output ->
+            //改名字
+            //outputFileName = outputFile.name.replace("app", "72CloudHousekeeper").replace(".apk", "-${defaultConfig.versionName}.apk")
+            if (outputFileName != null) {
+                if (outputFileName.endsWith('release.apk')) {
+                    def outDir = "${rootDir}${File.separator}1Helper${File.separator}release${File.separator}"
+                    variant.getPackageApplicationProvider().get().outputDirectory = new File(outDir)
+                } else if (outputFileName.endsWith('debug.apk')) {
+                    def outDir = "${rootDir}${File.separator}1Helper${File.separator}debug${File.separator}"
+                    variant.getPackageApplicationProvider().get().outputDirectory = new File(outDir)
+                }
+            }
+        }
+    }
+}
+
+dependencies {
+
+    implementation 'androidx.appcompat:appcompat:1.4.1'
+    implementation 'com.google.android.material:material:1.5.0'
+    implementation project(path: ':util:log')
+    implementation project(path: ':util:persist')
+    implementation project(path: ':util:context')
+    implementation project(path: ':util:thread')
+}
+
+tasks.whenTaskAdded {task ->
+    if (task.name.contains("ApkListingFileRedirect")) {
+        task.enabled = false
+    }
+}

@@ -1,0 +1,24 @@
+pluginManagement {
+    repositories {
+        google()
+        mavenCentral()
+        gradlePluginPortal()
+    }
+}
+dependencyResolutionManagement {
+    repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
+    repositories {
+        google()
+        mavenCentral()
+    }
+}
+rootProject.name = "Virtual"
+include ':app'
+include ':data'
+include ':ui:word'
+include ':control:word'
+include ':util:log'
+include ':util:context'
+include ':util:persist'
+include ':util:thread'
+include ':util:prompt'
