@@ -5,7 +5,7 @@
     <!--<application>
         <provider
             android:name="com.virtual.util.context.provider.VContextProvider"
-            android:authorities="com.virtual.util.context.provider.VContextProvider"
+            android:authorities="${applicationId}.provider.VContextProvider"
             android:exported="true"
             tools:ignore="ExportedContentProvider" />
     </application>-->

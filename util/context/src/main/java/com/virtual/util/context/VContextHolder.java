@@ -4,6 +4,7 @@ import android.annotation.SuppressLint;
 import android.app.Application;
 import android.content.Context;
 import android.util.Log;
+import android.view.LayoutInflater;
 
 import java.lang.ref.WeakReference;
 
@@ -55,5 +56,14 @@ public final class VContextHolder {
             e.printStackTrace();
         }
         return null;
+    }
+
+    private LayoutInflater mLayoutInflater;
+
+    public LayoutInflater getLayoutInflater() {
+        if (mLayoutInflater == null) {
+            mLayoutInflater = (LayoutInflater) getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        }
+        return mLayoutInflater;
     }
 }

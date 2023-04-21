@@ -19,9 +19,7 @@ public final class VLogProvider extends ContentProvider {
 
     @Retention(RetentionPolicy.SOURCE)
     public @interface Config {
-        String AUTHORITY = "com.virtual.util.log.provider.VLogProvider";
         String PATH_V_LOG = "v_log";
-        Uri CONTENT_URI = Uri.parse("content://" + AUTHORITY + "/" + PATH_V_LOG);
 
         String KEY_LEVEL = "key_level";
         String KEY_TAG = "key_tag";
@@ -49,8 +47,11 @@ public final class VLogProvider extends ContentProvider {
     @Nullable
     @Override
     public Uri insert(@NonNull Uri uri, @Nullable ContentValues values) {
-        if (Config.PATH_V_LOG.equals(uri.getPath().replaceAll("/", ""))) {
-            if (values != null) {
+        if (values != null) {
+            if (values.size() == 0) {
+                return null;
+            }
+            if (Config.PATH_V_LOG.equals(uri.getPath().replaceAll("/", ""))) {
                 Integer level = values.getAsInteger(Config.KEY_LEVEL);
                 String tag = values.getAsString(Config.KEY_TAG);
                 String message = values.getAsString(Config.KEY_MESSAGE);
@@ -85,4 +86,5 @@ public final class VLogProvider extends ContentProvider {
     public int update(@NonNull Uri uri, @Nullable ContentValues values, @Nullable String selection, @Nullable String[] selectionArgs) {
         return 0;
     }
+
 }

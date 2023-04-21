@@ -156,7 +156,7 @@ public final class VLogConfig {
 
                 String saveRootDir = this.saveRootDir;
                 if (TextUtils.isEmpty(saveRootDir)) {
-                    saveRootDir = VFilePath.getExternalFilesDir(this.logTag).getAbsolutePath();
+                    saveRootDir = VFilePath.getExternalFilesDir("Log_" + this.logTag).getAbsolutePath();
                 }
                 this.logConfig.setSaveRootDir(saveRootDir);
 

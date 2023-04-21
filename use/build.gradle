@@ -3,11 +3,11 @@ plugins {
 }
 
 android {
-    namespace 'com.virtual.app'
+    namespace 'com.virtual.use'
     compileSdk 33
 
     defaultConfig {
-        applicationId "com.virtual.app"
+        applicationId "com.virtual.use"
         minSdk 24
         targetSdk 33
         versionCode 1
@@ -15,30 +15,29 @@ android {
 
     }
 
-    compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_8
-        targetCompatibility JavaVersion.VERSION_1_8
-    }
 
     signingConfigs {
         debug {
-            storeFile file("${projectDir}${File.separator}virtual_app.jks")
-            storePassword 'virtual_app'
-            keyAlias = 'virtual_app'
-            keyPassword 'virtual_app'
+            storeFile file("${projectDir}${File.separator}virtual_use.jks")
+            storePassword 'virtual_use'
+            keyAlias = 'virtual_use'
+            keyPassword 'virtual_use'
         }
         release {
-            storeFile file("${projectDir}${File.separator}virtual_app.jks")
-            storePassword 'virtual_app'
-            keyAlias = 'virtual_app'
-            keyPassword 'virtual_app'
+            storeFile file("${projectDir}${File.separator}virtual_use.jks")
+            storePassword 'virtual_use'
+            keyAlias = 'virtual_use'
+            keyPassword 'virtual_use'
         }
     }
 
     buildTypes {
         release {
+            // 移除无用的resource文件
             shrinkResources true
+            // 开启代码混淆
             minifyEnabled true
+            // Zipalign优化,默认为true
             zipAlignEnabled true
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
             signingConfig signingConfigs.release
@@ -49,16 +48,20 @@ android {
         }
     }
 
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+
     applicationVariants.all { variant ->
         variant.outputs.all { output ->
             //改名字
-            //outputFileName = outputFile.name.replace("app", "72CloudHousekeeper").replace(".apk", "-${defaultConfig.versionName}.apk")
             if (outputFileName != null) {
                 if (outputFileName.endsWith('release.apk')) {
-                    def outDir = "${rootDir}${File.separator}1Helper${File.separator}app_release${File.separator}"
+                    def outDir = "${rootDir}${File.separator}1Helper${File.separator}use_release${File.separator}"
                     variant.getPackageApplicationProvider().get().outputDirectory = new File(outDir)
                 } else if (outputFileName.endsWith('debug.apk')) {
-                    def outDir = "${rootDir}${File.separator}1Helper${File.separator}app_debug${File.separator}"
+                    def outDir = "${rootDir}${File.separator}1Helper${File.separator}use_debug${File.separator}"
                     variant.getPackageApplicationProvider().get().outputDirectory = new File(outDir)
                 }
             }
@@ -72,11 +75,9 @@ dependencies {
     implementation 'com.google.android.material:material:1.5.0'
     implementation project(path: ':util:log')
     implementation project(path: ':util:persist')
-    implementation project(path: ':util:context')
-    implementation project(path: ':util:thread')
 }
 
-tasks.whenTaskAdded {task ->
+tasks.whenTaskAdded { task ->
     if (task.name.contains("ApkListingFileRedirect")) {
         task.enabled = false
     }

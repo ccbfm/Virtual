@@ -2,11 +2,11 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
-    <application>
+    <!--<application>
         <provider
             android:name="com.virtual.util.persist.provider.VPersistProvider"
-            android:authorities="com.virtual.util.persist.provider.VPersistProvider"
+            android:authorities="${applicationId}.provider.VPersistProvider"
             android:exported="true"
             tools:ignore="ExportedContentProvider" />
-    </application>
+    </application>-->
 </manifest>

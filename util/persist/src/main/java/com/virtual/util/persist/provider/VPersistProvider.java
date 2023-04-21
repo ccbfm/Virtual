@@ -19,9 +19,7 @@ public final class VPersistProvider extends ContentProvider {
 
     @Retention(RetentionPolicy.SOURCE)
     public @interface Config {
-        String AUTHORITY = "com.virtual.util.persist.provider.VPersistProvider";
         String PATH_V_PERSIST = "v_persist";
-        Uri CONTENT_URI = Uri.parse("content://" + AUTHORITY + "/" + PATH_V_PERSIST);
 
         String KEY_PERSIST_NAME = "key_persist_name";
         String KEY_KEY = "key_key";
@@ -37,6 +35,7 @@ public final class VPersistProvider extends ContentProvider {
     @Nullable
     @Override
     public Cursor query(@NonNull Uri uri, @Nullable String[] projection, @Nullable String selection, @Nullable String[] selectionArgs, @Nullable String sortOrder) {
+        //Log.e("VPersistProvider", "query-uri=" + uri + " " + Arrays.toString(selectionArgs));
         if (Config.PATH_V_PERSIST.equals(uri.getPath().replaceAll("/", ""))) {
             if (selectionArgs != null && selectionArgs.length == 2) {
                 try (MatrixCursor cursor = new MatrixCursor(new String[]{Config.KEY_VALUE})) {
@@ -62,8 +61,11 @@ public final class VPersistProvider extends ContentProvider {
     @Nullable
     @Override
     public Uri insert(@NonNull Uri uri, @Nullable ContentValues values) {
-        if (Config.PATH_V_PERSIST.equals(uri.getPath().replaceAll("/", ""))) {
-            if (values != null) {
+        if (values != null) {
+            if (values.size() == 0) {
+                return null;
+            }
+            if (Config.PATH_V_PERSIST.equals(uri.getPath().replaceAll("/", ""))) {
                 String persistName = values.getAsString(Config.KEY_PERSIST_NAME);
                 String key = values.getAsString(Config.KEY_KEY);
                 String value = values.getAsString(Config.KEY_VALUE);
