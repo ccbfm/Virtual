@@ -3,6 +3,7 @@ package com.virtual.util.socket.local.server;
 import android.net.Credentials;
 import android.net.LocalServerSocket;
 import android.net.LocalSocket;
+import android.os.Looper;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
@@ -16,7 +17,18 @@ public abstract class VLocalServer extends VLocalWork {
     @NonNull
     public abstract String address();
 
-    protected abstract VLocalServerConnect createVServerConnect(int uid, int pid, LocalSocket localSocket);
+    protected Looper acceptLooper() {
+        return null;
+    }
+
+    protected Looper sendLooper() {
+        return null;
+    }
+
+    protected abstract VLocalServerConnect createVServerConnect(int uid, int pid,
+                                                                LocalSocket localSocket,
+                                                                Looper acceptLooper,
+                                                                Looper sendLooper);
 
     @Override
     protected void doWork() throws Throwable {
@@ -31,7 +43,8 @@ public abstract class VLocalServer extends VLocalWork {
                 int pid = credentials.getPid();
                 Log.d("VLocalServer", "doWork uid: " + uid + " pid: " + pid);
 
-                VLocalServerConnect connect = createVServerConnect(uid, pid, localSocket);
+                VLocalServerConnect connect = createVServerConnect(uid, pid, localSocket,
+                        acceptLooper(), sendLooper());
                 connect.start();
             }
         }
@@ -44,7 +57,7 @@ public abstract class VLocalServer extends VLocalWork {
 
     @Override
     public void start() {
-        VLocalWorkPool.instance().executor().execute(this);
+        VLocalWorkPool.instance().startServer(this);
     }
 
     @Override

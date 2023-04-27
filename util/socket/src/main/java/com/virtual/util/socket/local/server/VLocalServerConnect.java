@@ -5,6 +5,7 @@ import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.Looper;
 import android.os.Message;
+import android.text.TextUtils;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
@@ -17,11 +18,15 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 
 public abstract class VLocalServerConnect extends VLocalWork {
-
-    private Handler mHandler;
     private final int mUid;
     private final int mPid;
-    private final LocalSocket mLocalSocket;
+    private LocalSocket mLocalSocket;
+    private Looper mAcceptLooper;
+    private Looper mSendLooper;
+
+    private Handler mAcceptHandler;
+    private Handler mSendHandler;
+    private HandlerThread mHandlerThread;
     private PrintWriter mWriter;
     private BufferedReader mReader;
 
@@ -34,16 +39,43 @@ public abstract class VLocalServerConnect extends VLocalWork {
         mLocalSocket = localSocket;
     }
 
+    public VLocalServerConnect(int uid, int pid, LocalSocket localSocket,
+                               Looper acceptLooper, Looper sendLooper) {
+        mUid = uid;
+        mPid = pid;
+        mLocalSocket = localSocket;
+        mAcceptLooper = acceptLooper;
+        mSendLooper = sendLooper;
+    }
+
     /**
-     * 处理接收信息 Looper
+     * android.os.NetworkOnMainThreadException
      *
      * @return Looper
      */
     @NonNull
-    protected Looper handleLooper() {
-        HandlerThread handlerThread = new HandlerThread("local-server-connect-result");
-        handlerThread.start();
-        return handlerThread.getLooper();
+    protected Looper acceptLooper() {
+        if (mAcceptLooper != null) {
+            return mAcceptLooper;
+        }
+        checkHandlerThread();
+        return mHandlerThread.getLooper();
+    }
+
+    @NonNull
+    protected Looper sendLooper() {
+        if (mSendLooper != null) {
+            return mSendLooper;
+        }
+        checkHandlerThread();
+        return mHandlerThread.getLooper();
+    }
+
+    private void checkHandlerThread() {
+        if (mHandlerThread == null) {
+            mHandlerThread = new HandlerThread("server-connect");
+            mHandlerThread.start();
+        }
     }
 
     protected abstract void handleResult(String result);
@@ -66,10 +98,13 @@ public abstract class VLocalServerConnect extends VLocalWork {
                 Log.d("VLocalServerConnect", "connected info: " + info);
                 mName = info;
                 mUserId = mUid / 100000;
+                if (TextUtils.isEmpty(mName) || mUserId < 0) {
+                    throw new NullPointerException("VLocalServerConnect connected is null.{ " + mName + " , " + mUserId + " }");
+                }
                 recordConnect(mName, mUserId);
             } else {
-                if (mHandler == null) {
-                    mHandler = new Handler(handleLooper()) {
+                if (mAcceptHandler == null) {
+                    mAcceptHandler = new Handler(acceptLooper()) {
                         @Override
                         public void handleMessage(@NonNull Message msg) {
                             if (msg.what == 1) {
@@ -83,7 +118,7 @@ public abstract class VLocalServerConnect extends VLocalWork {
                 Message message = Message.obtain();
                 message.what = 1;
                 message.obj = result;
-                mHandler.sendMessage(message);
+                mAcceptHandler.sendMessage(message);
             }
         }
     }
@@ -102,11 +137,28 @@ public abstract class VLocalServerConnect extends VLocalWork {
         VLocalWorkPool.instance().executor().execute(this);
     }
 
-    public void send(final String message) {
-        if (mWriter != null) {
-            mWriter.println(message);
-            mWriter.flush();
+    public void send(final String text) {
+        if (mWriter == null) {
+            return;
         }
+        if (mSendHandler == null) {
+            mSendHandler = new Handler(sendLooper()) {
+                @Override
+                public void handleMessage(@NonNull Message msg) {
+                    if (msg.what == 1) {
+                        String text = (String) msg.obj;
+                        if (mWriter != null) {
+                            mWriter.println(text);
+                            mWriter.flush();
+                        }
+                    }
+                }
+            };
+        }
+        Message message = Message.obtain();
+        message.what = 1;
+        message.obj = text;
+        mSendHandler.sendMessage(message);
     }
 
     @Override
@@ -117,12 +169,19 @@ public abstract class VLocalServerConnect extends VLocalWork {
         try {
             if (mWriter != null) {
                 mWriter.close();
+                mWriter = null;
             }
             if (mReader != null) {
                 mReader.close();
+                mReader = null;
             }
             if (mLocalSocket != null) {
                 mLocalSocket.close();
+                mLocalSocket = null;
+            }
+            if (mHandlerThread != null) {
+                mHandlerThread.quit();
+                mHandlerThread = null;
             }
         } catch (Throwable throwable) {
             Log.e("VLocalServerConnect", "close Throwable: ", throwable);
@@ -132,6 +191,9 @@ public abstract class VLocalServerConnect extends VLocalWork {
     @NonNull
     @Override
     public String toString() {
-        return "VLocalServerConnect{" + "mUid=" + mUid + ", mName='" + mName + '\'' + '}';
+        return "VLocalServerConnect{" +
+                "mUid=" + mUid +
+                ", mName='" + mName + '\'' +
+                '}';
     }
 }

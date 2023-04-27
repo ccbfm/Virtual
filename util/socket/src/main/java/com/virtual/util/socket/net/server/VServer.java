@@ -1,5 +1,6 @@
 package com.virtual.util.socket.net.server;
 
+import android.os.Looper;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
@@ -18,7 +19,16 @@ public abstract class VServer extends VWork {
 
     public abstract int port();
 
-    protected abstract VServerConnect createVServerConnect(int port, Socket socket);
+    protected Looper acceptLooper() {
+        return null;
+    }
+
+    protected Looper sendLooper() {
+        return null;
+    }
+
+    protected abstract VServerConnect createVServerConnect(int port, Socket socket,
+                                                           Looper acceptLooper, Looper sendLooper);
 
     @Override
     protected void doWork() throws Throwable {
@@ -29,7 +39,7 @@ public abstract class VServer extends VWork {
             Log.d("VServer", "doWork socket: " + socket);
             if (socket != null) {
                 int port = socket.getPort();
-                VServerConnect connect = createVServerConnect(port, socket);
+                VServerConnect connect = createVServerConnect(port, socket, acceptLooper(), sendLooper());
                 connect.start();
             }
         }
@@ -42,7 +52,7 @@ public abstract class VServer extends VWork {
 
     @Override
     public void start() {
-        VWorkPool.instance().executor().execute(this);
+        VWorkPool.instance().startServer(this);
     }
 
     @Override

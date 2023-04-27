@@ -57,7 +57,7 @@ public final class VLocalWorkPool {
                 Log.d("VLocalWorkPool", address + " startServer is exist.");
                 return;
             }
-            server.start();
+            executor().execute(server);
             mServerMap.put(address, server);
         }
     }

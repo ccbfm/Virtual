@@ -19,7 +19,9 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 
 public abstract class VLocalClient extends VLocalWork {
-    private Handler mHandler;
+    private Handler mAcceptHandler;
+    private Handler mSendHandler;
+    private HandlerThread mHandlerThread;
     private LocalSocket mClientSocket;
     private PrintWriter mWriter;
     private BufferedReader mReader;
@@ -35,15 +37,27 @@ public abstract class VLocalClient extends VLocalWork {
     }
 
     /**
-     * 处理接收信息 Looper
+     * android.os.NetworkOnMainThreadException
      *
      * @return Looper
      */
     @NonNull
-    protected Looper handleLooper() {
-        HandlerThread handlerThread = new HandlerThread("local-client-result");
-        handlerThread.start();
-        return handlerThread.getLooper();
+    protected Looper acceptLooper() {
+        checkHandlerThread();
+        return mHandlerThread.getLooper();
+    }
+
+    @NonNull
+    protected Looper sendLooper() {
+        checkHandlerThread();
+        return mHandlerThread.getLooper();
+    }
+
+    private void checkHandlerThread() {
+        if (mHandlerThread == null) {
+            mHandlerThread = new HandlerThread("local-server-connect");
+            mHandlerThread.start();
+        }
     }
 
     protected abstract void handleResult(String result);
@@ -69,8 +83,8 @@ public abstract class VLocalClient extends VLocalWork {
             if (result.startsWith("connected")) {
                 send("connected" + name());
             } else {
-                if (mHandler == null) {
-                    mHandler = new Handler(handleLooper()) {
+                if (mAcceptHandler == null) {
+                    mAcceptHandler = new Handler(acceptLooper()) {
                         @Override
                         public void handleMessage(@NonNull Message msg) {
                             if (msg.what == 1) {
@@ -84,7 +98,7 @@ public abstract class VLocalClient extends VLocalWork {
                 Message message = Message.obtain();
                 message.what = 1;
                 message.obj = result;
-                mHandler.sendMessage(message);
+                mAcceptHandler.sendMessage(message);
             }
         }
     }
@@ -96,14 +110,31 @@ public abstract class VLocalClient extends VLocalWork {
 
     @Override
     public void start() {
-        VLocalWorkClientPool.instance().executor().execute(this);
+        VLocalWorkClientPool.instance().startClient(this);
     }
 
-    public void send(final String message) {
-        if (mWriter != null) {
-            mWriter.println(message);
-            mWriter.flush();
+    public void send(final String text) {
+        if (mWriter == null) {
+            return;
         }
+        if (mSendHandler == null) {
+            mSendHandler = new Handler(sendLooper()) {
+                @Override
+                public void handleMessage(@NonNull Message msg) {
+                    if (msg.what == 1) {
+                        String text = (String) msg.obj;
+                        if (mWriter != null) {
+                            mWriter.println(text);
+                            mWriter.flush();
+                        }
+                    }
+                }
+            };
+        }
+        Message message = Message.obtain();
+        message.what = 1;
+        message.obj = text;
+        mSendHandler.sendMessage(message);
     }
 
     @Override
@@ -115,12 +146,19 @@ public abstract class VLocalClient extends VLocalWork {
         try {
             if (mWriter != null) {
                 mWriter.close();
+                mWriter = null;
             }
             if (mReader != null) {
                 mReader.close();
+                mReader = null;
             }
             if (mClientSocket != null) {
                 mClientSocket.close();
+                mClientSocket = null;
+            }
+            if (mHandlerThread != null) {
+                mHandlerThread.quit();
+                mHandlerThread = null;
             }
         } catch (Throwable throwable) {
             Log.e("VLocalClient", "close Throwable: ", throwable);

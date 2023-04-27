@@ -55,7 +55,7 @@ public final class VLocalWorkClientPool {
                 Log.d("VWorkClientPool", name + " startClient is exist.");
                 return;
             }
-            client.start();
+            executor().execute(client);
             mClientMap.put(name, client);
         }
     }
