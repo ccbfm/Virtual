@@ -5,7 +5,13 @@ ext {
             targetSdk : 33
     ]
 
-    version = [
-            appcompat: "1.6.1"
+    library_version = [
+            appcompat: "1.6.1",
+            material : "1.8.0"
+    ]
+
+    library = [
+            appcompat: "androidx.appcompat:appcompat:$library_version.appcompat",
+            material : "com.google.android.material:material:$library_version.material"
     ]
 }

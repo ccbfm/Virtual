@@ -27,6 +27,6 @@ android {
 
 dependencies {
 
-    implementation "androidx.appcompat:appcompat:$rootProject.ext.version.appcompat"
+    implementation rootProject.ext.library.appcompat
     implementation project(path: ':util:context')
 }

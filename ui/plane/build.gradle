@@ -3,7 +3,7 @@ plugins {
 }
 
 android {
-    namespace 'com.virtual.util.log'
+    namespace 'com.virtual.ui.plane'
     compileSdk rootProject.ext.android.compileSdk
 
     defaultConfig {
@@ -26,8 +26,7 @@ android {
 }
 
 dependencies {
+
     implementation rootProject.ext.library.appcompat
-    implementation project(path: ':util:persist')
-    implementation project(path: ':util:context')
-    implementation project(path: ':util:thread')
+    implementation rootProject.ext.library.material
 }
