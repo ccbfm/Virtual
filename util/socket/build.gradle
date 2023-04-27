@@ -3,7 +3,7 @@ plugins {
 }
 
 android {
-    namespace 'com.virtual.util.context'
+    namespace 'com.virtual.util.socket'
     compileSdk rootProject.ext.android.compileSdk
 
     defaultConfig {
@@ -26,5 +26,5 @@ android {
 }
 
 dependencies {
-
+    implementation "androidx.appcompat:appcompat:$rootProject.ext.version.appcompat"
 }

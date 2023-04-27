@@ -1,0 +1,11 @@
+ext {
+    android = [
+            compileSdk: 33,
+            minSdk    : 24,
+            targetSdk : 33
+    ]
+
+    version = [
+            appcompat: "1.6.1"
+    ]
+}

@@ -4,11 +4,11 @@ plugins {
 
 android {
     namespace 'com.virtual.data'
-    compileSdk 33
+    compileSdk rootProject.ext.android.compileSdk
 
     defaultConfig {
-        minSdk 24
-        targetSdk 33
+        minSdk rootProject.ext.android.minSdk
+        targetSdk rootProject.ext.android.targetSdk
 
         consumerProguardFiles "consumer-rules.pro"
     }
@@ -27,6 +27,6 @@ android {
 
 dependencies {
 
-    implementation 'androidx.appcompat:appcompat:1.4.1'
+    implementation "androidx.appcompat:appcompat:$rootProject.ext.version.appcompat"
     implementation 'com.google.android.material:material:1.5.0'
 }

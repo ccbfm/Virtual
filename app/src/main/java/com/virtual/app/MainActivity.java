@@ -1,12 +1,13 @@
 package com.virtual.app;
 
 import android.os.Bundle;
+import android.os.Process;
 import android.util.Log;
 import android.view.View;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.virtual.util.log.VLogExported;
+import com.virtual.util.log.VLog;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -22,7 +23,7 @@ public class MainActivity extends AppCompatActivity {
                 Log.d("Virtual", "app onClick " + v);
             }
         });
-        //VLogExported.i("app", "MainActivity-onCreate");
+        VLog.i("app", "MainActivity-onCreate " + Process.myUid() + " " + Process.myUserHandle().toString());
     }
 
 }

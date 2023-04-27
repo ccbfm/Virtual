@@ -4,12 +4,12 @@ plugins {
 
 android {
     namespace 'com.virtual.use'
-    compileSdk 33
+    compileSdk rootProject.ext.android.compileSdk
 
     defaultConfig {
         applicationId "com.virtual.use"
-        minSdk 24
-        targetSdk 33
+        minSdk rootProject.ext.android.minSdk
+        targetSdk rootProject.ext.android.targetSdk
         versionCode 1
         versionName "1.0"
 
@@ -71,10 +71,13 @@ android {
 
 dependencies {
 
-    implementation 'androidx.appcompat:appcompat:1.4.1'
+    implementation "androidx.appcompat:appcompat:$rootProject.ext.version.appcompat"
     implementation 'com.google.android.material:material:1.5.0'
     implementation project(path: ':util:log')
     implementation project(path: ':util:persist')
+    implementation project(path: ':util:thread')
+    implementation project(path: ':util:socket')
+    implementation project(path: ':util:common')
 }
 
 tasks.whenTaskAdded { task ->

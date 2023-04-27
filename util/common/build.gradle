@@ -3,12 +3,12 @@ plugins {
 }
 
 android {
-    namespace 'com.virtual.util.ipc'
-    compileSdk 33
+    namespace 'com.virtual.util.common'
+    compileSdk rootProject.ext.android.compileSdk
 
     defaultConfig {
-        minSdk 24
-        targetSdk 33
+        minSdk rootProject.ext.android.minSdk
+        targetSdk rootProject.ext.android.targetSdk
 
         consumerProguardFiles "consumer-rules.pro"
     }
@@ -27,5 +27,5 @@ android {
 
 dependencies {
 
-    implementation 'androidx.appcompat:appcompat:1.4.1'
+    implementation "androidx.appcompat:appcompat:$rootProject.ext.version.appcompat"
 }

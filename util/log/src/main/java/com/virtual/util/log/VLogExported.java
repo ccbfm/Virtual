@@ -128,15 +128,18 @@ public final class VLogExported {
         public /*static*/ class LogTask extends VSimpleTask<Void> {
             @Override
             protected Void doTask() throws Throwable {
+
                 synchronized (mLogDataQueue) {
                     if (mLogDataQueue.size() == 0) {
                         mLogDataQueue.wait();
                     }
-                    LogData logData = mLogDataQueue.poll();
-                    if (logData != null) {
-                        exportedProvider(logData.level, logData.tag, logData.msg);
-                    }
                 }
+
+                LogData logData = mLogDataQueue.poll();
+                if (logData != null) {
+                    exportedProvider(logData.level, logData.tag, logData.msg);
+                }
+
                 return null;
             }
 
