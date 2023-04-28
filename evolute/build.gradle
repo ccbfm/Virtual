@@ -1,0 +1,81 @@
+plugins {
+    id 'com.android.application'
+}
+
+android {
+    namespace 'com.virtual.evolute'
+    compileSdk rootProject.ext.android.compileSdk
+
+    defaultConfig {
+        applicationId "com.virtual.evolute"
+        minSdk rootProject.ext.android.minSdk
+        targetSdk rootProject.ext.android.targetSdk
+        versionCode 1
+        versionName "1.0"
+
+    }
+
+    signingConfigs {
+        debug {
+            storeFile file("${projectDir}${File.separator}virtual_evolute.jks")
+            storePassword 'virtual_evolute'
+            keyAlias = 'virtual_evolute'
+            keyPassword 'virtual_evolute'
+        }
+        release {
+            storeFile file("${projectDir}${File.separator}virtual_evolute.jks")
+            storePassword 'virtual_evolute'
+            keyAlias = 'virtual_evolute'
+            keyPassword 'virtual_evolute'
+        }
+    }
+
+    buildTypes {
+        release {
+            // 移除无用的resource文件
+            shrinkResources true
+            // 开启代码混淆
+            minifyEnabled true
+            // Zipalign优化,默认为true
+            zipAlignEnabled true
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            signingConfig signingConfigs.release
+        }
+
+        debug {
+            signingConfig signingConfigs.debug
+        }
+    }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+
+    applicationVariants.all { variant ->
+        variant.outputs.all { output ->
+            //改名字
+            if (outputFileName != null) {
+                if (outputFileName.endsWith('release.apk')) {
+                    def outDir = "${rootDir}${File.separator}1Helper${File.separator}evolute_release${File.separator}"
+                    variant.getPackageApplicationProvider().get().outputDirectory = new File(outDir)
+                } else if (outputFileName.endsWith('debug.apk')) {
+                    def outDir = "${rootDir}${File.separator}1Helper${File.separator}evolute_debug${File.separator}"
+                    variant.getPackageApplicationProvider().get().outputDirectory = new File(outDir)
+                }
+            }
+        }
+    }
+}
+
+dependencies {
+
+    implementation rootProject.ext.library.appcompat
+    implementation rootProject.ext.library.material
+    implementation project(path: ':ui:plane')
+}
+
+tasks.whenTaskAdded { task ->
+    if (task.name.contains("ApkListingFileRedirect")) {
+        task.enabled = false
+    }
+}

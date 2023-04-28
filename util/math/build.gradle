@@ -3,7 +3,7 @@ plugins {
 }
 
 android {
-    namespace 'com.virtual.ui.plane'
+    namespace 'com.virtual.util.math'
     compileSdk rootProject.ext.android.compileSdk
 
     defaultConfig {
@@ -28,6 +28,4 @@ android {
 dependencies {
 
     implementation rootProject.ext.library.appcompat
-    implementation rootProject.ext.library.material
-    implementation project(path: ':util:math')
 }
