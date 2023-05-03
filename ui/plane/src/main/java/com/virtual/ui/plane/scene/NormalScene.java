@@ -72,13 +72,24 @@ public class NormalScene extends BaseScene {
     }
 
     private static class NormalChildLayer extends NormalLayer {
-        private final Paint mOPaint;
+        private final Paint mOPaint, mMaskPaint, mTextPaint;
+        private final float mTx, mTy;
 
         public NormalChildLayer(int width, int height, float cx, float cy, float outRadius, float innerRadius) {
             super(width, height, cx, cy, outRadius, innerRadius);
             mOPaint = createPaint();
             setPaintStroke(mOPaint, 1);
             mOPaint.setColor(Color.BLACK);
+
+            mMaskPaint = createPaint();
+            mMaskPaint.setColor(Color.parseColor("#10808080"));
+
+            mTextPaint = createPaint();
+            mTextPaint.setTextSize(outRadius);
+            mTextPaint.setColor(Color.parseColor("#FFC0CB"));
+            Paint.FontMetrics fontMetrics = mTextPaint.getFontMetrics();
+            mTy = cy - ((fontMetrics.bottom + fontMetrics.top) / 2);
+            mTx = cx - (outRadius / 2);
         }
 
         @Override
@@ -96,7 +107,12 @@ public class NormalScene extends BaseScene {
 
         @Override
         public void onDraw(Canvas canvas) {
-            canvas.drawCircle(mCx, mCy, mOutRadius, mOPaint);
+            if (mIsInner) {
+                canvas.drawCircle(mCx, mCy, mOutRadius, mMaskPaint);
+            } else {
+                canvas.drawCircle(mCx, mCy, mOutRadius, mOPaint);
+            }
+            canvas.drawText("陌", mTx, mTy, mTextPaint);
         }
     }
 
@@ -150,11 +166,12 @@ public class NormalScene extends BaseScene {
         @Override
         protected void initChildLayers(List<VLayer> layers) {
             Random random = new Random();
-            for (int i = 0; i < 12; i++) {
+            float ir = (mOutRadius - mInnerRadius) / 2.0f;
+            float or = (ir / 5.0f) * 4;
+            for (int i = 0; i < 20; i++) {
                 int angle = random.nextInt(360);
-                float ir = (mOutRadius - mInnerRadius) / 2.0f;
                 PointF pointF = MathCircle.pointByAngle(mCx, mCy, angle, mOutRadius - ir);
-                layers.add(new NormalChildLayer(mWidth, mHeight, pointF.x, pointF.y, ir - 3.f, 0));
+                layers.add(new NormalChildLayer(mWidth, mHeight, pointF.x, pointF.y, or, 0));
             }
         }
 
@@ -183,7 +200,7 @@ public class NormalScene extends BaseScene {
 
     }
 
-    private static class CenterLayer extends NormalLayer {
+    private static class CenterLayer extends NormalGroupLayer {
         private final Paint mOPaint;
 
         public CenterLayer(int width, int height, float cx, float cy, float outRadius, float innerRadius) {
@@ -195,13 +212,30 @@ public class NormalScene extends BaseScene {
         }
 
         @Override
+        protected void initChildLayers(List<VLayer> layers) {
+            Random random = new Random();
+            float ir = (mOutRadius - mInnerRadius) / 2.0f;
+            float or = (ir / 5.0f) * 4;
+            for (int i = 0; i < 20; i++) {
+                int angle = random.nextInt(360);
+                PointF pointF = MathCircle.pointByAngle(mCx, mCy, angle, mOutRadius - ir);
+                layers.add(new NormalChildLayer(mWidth, mHeight, pointF.x, pointF.y, or, 0));
+            }
+        }
+
+        @Override
+        protected Region initRegion() {
+            return super.initRegion();
+        }
+
+        @Override
         public void onDraw(Canvas canvas) {
             canvas.drawCircle(mCx, mCy, mOutRadius, mOPaint);
         }
 
     }
 
-    private static class OuterLayer extends NormalLayer {
+    private static class OuterLayer extends NormalGroupLayer {
         private final Paint mOPaint;
 
         public OuterLayer(int width, int height, float cx, float cy, float outRadius, float innerRadius) {
@@ -210,6 +244,18 @@ public class NormalScene extends BaseScene {
             mOPaint = createPaint();
             setPaintStroke(mOPaint, 2);
             mOPaint.setColor(Color.GRAY);
+        }
+
+        @Override
+        protected void initChildLayers(List<VLayer> layers) {
+            Random random = new Random();
+            float ir = (mOutRadius - mInnerRadius) / 2.0f;
+            float or = (ir / 5.0f) * 4;
+            for (int i = 0; i < 20; i++) {
+                int angle = random.nextInt(360);
+                PointF pointF = MathCircle.pointByAngle(mCx, mCy, angle, mOutRadius - ir);
+                layers.add(new NormalChildLayer(mWidth, mHeight, pointF.x, pointF.y, or, 0));
+            }
         }
 
         @Override

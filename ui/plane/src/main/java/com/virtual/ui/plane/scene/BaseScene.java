@@ -73,15 +73,14 @@ public abstract class BaseScene extends View {
                     }
                 }
             }
-        } else if (action == MotionEvent.ACTION_UP) {
-            if (mDownLayer != null && mDownLayer.isInner(x, y)) {
-                mDownLayer.onClick();
-                mDownLayer.onTouchInner(false);
-            }
-            mDownLayer = null;
-        } else if (action == MotionEvent.ACTION_MOVE) {
+        } else if (action == MotionEvent.ACTION_UP
+                || action == MotionEvent.ACTION_CANCEL) {
             if (mDownLayer != null) {
-                mDownLayer.onTouchInner(mDownLayer.isInner(x, y));
+                if (mDownLayer.isInner(x, y)) {
+                    mDownLayer.onClick();
+                }
+                mDownLayer.onTouchInner(false);
+                mDownLayer = null;
             }
         }
         return true;

@@ -8,7 +8,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 public abstract class VGroupLayer extends VLayer {
-    private final List<VLayer> mChildLayers = new LinkedList<>();
+    protected final List<VLayer> mChildLayers = new LinkedList<>();
     private VLayer mTouchChildLayer;
 
     public VGroupLayer(int width, int height) {
@@ -37,10 +37,12 @@ public abstract class VGroupLayer extends VLayer {
     @Override
     public boolean isInner(float x, float y) {
         if (super.isInner(x, y)) {
-            for (VLayer layer : mChildLayers) {
-                if (layer.isInner(x, y)) {
-                    mTouchChildLayer = layer;
-                    return true;
+            if (mTouchChildLayer == null) {
+                for (VLayer layer : mChildLayers) {
+                    if (layer.isInner(x, y)) {
+                        mTouchChildLayer = layer;
+                        return true;
+                    }
                 }
             }
         }
@@ -51,6 +53,9 @@ public abstract class VGroupLayer extends VLayer {
     public void onTouchInner(boolean inner) {
         if (mTouchChildLayer != null) {
             mTouchChildLayer.onTouchInner(inner);
+            if (!inner) {
+                mTouchChildLayer = null;
+            }
         } else {
             super.onTouchInner(inner);
         }
