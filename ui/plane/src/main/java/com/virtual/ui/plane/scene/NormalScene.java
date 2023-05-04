@@ -113,9 +113,7 @@ public class NormalScene extends BaseScene {
             circlePath.addCircle(layerData.cx, layerData.cy, layerData.outRadius, Path.Direction.CW);
             RectF rectF = new RectF();
             circlePath.computeBounds(rectF, true);
-            //Log.d("NormalChildLayer", "initRegion rectF: " + rectF);
-            boolean flag = region.setPath(circlePath, new Region((int) rectF.left, (int) rectF.top, (int) rectF.right, (int) rectF.bottom));
-            //Log.d("NormalChildLayer", "initRegion flag: " + flag);
+            region.setPath(circlePath, new Region((int) rectF.left, (int) rectF.top, (int) rectF.right, (int) rectF.bottom));
             return region;
         }
 
@@ -153,9 +151,7 @@ public class NormalScene extends BaseScene {
             circlePath.addCircle(layerData.cx, layerData.cy, layerData.outRadius, Path.Direction.CW);
             RectF rectF = new RectF();
             circlePath.computeBounds(rectF, true);
-            //Log.d("MiddleLayer", "initRegion rectF: " + rectF);
-            boolean flag = region.setPath(circlePath, new Region((int) rectF.left, (int) rectF.top, (int) rectF.right, (int) rectF.bottom));
-            //Log.d("MiddleLayer", "initRegion flag: " + flag);
+            region.setPath(circlePath, new Region((int) rectF.left, (int) rectF.top, (int) rectF.right, (int) rectF.bottom));
             return region;
         }
 
@@ -206,9 +202,7 @@ public class NormalScene extends BaseScene {
             innerPath.addCircle(layerData.cx, layerData.cy, layerData.innerRadius, Path.Direction.CW);
 
             circlePath.op(innerPath, Path.Op.DIFFERENCE);
-            //Log.d("InnerLayer", "initRegion rectF: " + rectF);
-            boolean flag = region.setPath(circlePath, new Region((int) rectF.left, (int) rectF.top, (int) rectF.right, (int) rectF.bottom));
-            //Log.d("InnerLayer", "initRegion flag: " + flag);
+            region.setPath(circlePath, new Region((int) rectF.left, (int) rectF.top, (int) rectF.right, (int) rectF.bottom));
             return region;
         }
 
@@ -289,9 +283,7 @@ public class NormalScene extends BaseScene {
             innerPath.addCircle(layerData.cx, layerData.cy, layerData.innerRadius, Path.Direction.CW);
 
             circlePath.op(innerPath, Path.Op.DIFFERENCE);
-            //Log.d("InnerLayer", "initRegion rectF: " + rectF);
-            boolean flag = region.setPath(circlePath, new Region((int) rectF.left, (int) rectF.top, (int) rectF.right, (int) rectF.bottom));
-            //Log.d("InnerLayer", "initRegion flag: " + flag);
+            region.setPath(circlePath, new Region((int) rectF.left, (int) rectF.top, (int) rectF.right, (int) rectF.bottom));
             return region;
         }
 
@@ -339,9 +331,7 @@ public class NormalScene extends BaseScene {
             innerPath.addCircle(layerData.cx, layerData.cy, layerData.innerRadius, Path.Direction.CW);
 
             circlePath.op(innerPath, Path.Op.DIFFERENCE);
-            //Log.d("InnerLayer", "initRegion rectF: " + rectF);
-            boolean flag = region.setPath(circlePath, new Region((int) rectF.left, (int) rectF.top, (int) rectF.right, (int) rectF.bottom));
-            //Log.d("InnerLayer", "initRegion flag: " + flag);
+            region.setPath(circlePath, new Region((int) rectF.left, (int) rectF.top, (int) rectF.right, (int) rectF.bottom));
             return region;
         }
 

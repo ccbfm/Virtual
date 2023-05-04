@@ -44,6 +44,8 @@ public abstract class GroupLayer<T extends Layer<?>, D> extends Layer<D> {
                         return true;
                     }
                 }
+            } else {
+                return mTouchChildLayer.isInner(x, y);
             }
         }
         return false;
