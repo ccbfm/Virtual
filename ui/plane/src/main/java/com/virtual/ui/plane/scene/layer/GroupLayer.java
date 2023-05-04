@@ -7,29 +7,29 @@ import android.view.View;
 import java.util.LinkedList;
 import java.util.List;
 
-public abstract class VGroupLayer extends VLayer {
-    protected final List<VLayer> mChildLayers = new LinkedList<>();
-    private VLayer mTouchChildLayer;
+public abstract class GroupLayer<T extends Layer<?>, D> extends Layer<D> {
+    protected final List<T> mChildLayers = new LinkedList<>();
+    private Layer<?> mTouchChildLayer;
 
-    public VGroupLayer(int width, int height) {
-        super(width, height);
+    public GroupLayer(D layerData) {
+        super(layerData);
     }
 
     @Override
     public void attached(View view) {
         super.attached(view);
         initChildLayers(mChildLayers);
-        for (VLayer layer : mChildLayers) {
+        for (Layer<?> layer : mChildLayers) {
             layer.attached(view);
         }
     }
 
-    protected abstract void initChildLayers(List<VLayer> layers);
+    protected abstract void initChildLayers(List<T> layers);
 
     @Override
     public void draw(Canvas canvas) {
         super.draw(canvas);
-        for (VLayer layer : mChildLayers) {
+        for (Layer<?> layer : mChildLayers) {
             layer.draw(canvas);
         }
     }
@@ -38,7 +38,7 @@ public abstract class VGroupLayer extends VLayer {
     public boolean isInner(float x, float y) {
         if (super.isInner(x, y)) {
             if (mTouchChildLayer == null) {
-                for (VLayer layer : mChildLayers) {
+                for (Layer<?> layer : mChildLayers) {
                     if (layer.isInner(x, y)) {
                         mTouchChildLayer = layer;
                         return true;

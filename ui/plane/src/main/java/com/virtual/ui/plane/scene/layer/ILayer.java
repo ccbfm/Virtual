@@ -3,7 +3,7 @@ package com.virtual.ui.plane.scene.layer;
 import android.graphics.Canvas;
 import android.view.View;
 
-public interface IVLayer {
+public interface ILayer {
 
     void attached(View view);
 

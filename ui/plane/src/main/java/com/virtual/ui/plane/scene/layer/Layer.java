@@ -6,15 +6,25 @@ import android.graphics.Region;
 import android.util.Log;
 import android.view.View;
 
-public abstract class VLayer implements IVLayer {
-    protected final int mWidth, mHeight;
+import androidx.annotation.CallSuper;
+
+public abstract class Layer<D> implements ILayer {
+    protected D mLayerData;
     private Region mRegion;
     private View mView;
     protected boolean mIsInner = false;
 
-    public VLayer(int width, int height) {
-        mWidth = width;
-        mHeight = height;
+    public Layer(D layerData) {
+        mLayerData = layerData;
+    }
+
+    @CallSuper
+    public void update(D layerData) {
+        mLayerData = layerData;
+    }
+
+    public D getLayerData() {
+        return mLayerData;
     }
 
     @Override
@@ -54,11 +64,11 @@ public abstract class VLayer implements IVLayer {
         }
     }
 
-    public void invalidate(){
+    public void invalidate() {
         mView.invalidate();
     }
 
-    public void postInvalidate(){
+    public void postInvalidate() {
         mView.postInvalidate();
     }
 
