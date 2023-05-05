@@ -1,5 +1,8 @@
 package com.virtual.ui.plane.scene.data;
 
+import java.util.LinkedList;
+import java.util.List;
+
 public class NormalData {
 
     public Middle middle;
@@ -8,6 +11,7 @@ public class NormalData {
     public Outer outer;
 
     public static class Normal extends LayerData {
+        public BodyData body;
         public float cx;
         public float cy;
         public float outRadius;
@@ -25,9 +29,20 @@ public class NormalData {
         }
     }
 
+    public static class NormalGroup extends Normal {
+        public List<NormalChild> childList = new LinkedList<>();
+
+        public NormalGroup() {
+        }
+
+        public NormalGroup(int width, int height, float cx, float cy, float outRadius, float innerRadius) {
+            super(width, height, cx, cy, outRadius, innerRadius);
+        }
+    }
+
     public static class NormalChild extends Normal {
-        public String text;
-        public float angle;
+        public boolean active = false;
+        public float angle = -1f;
         public float tx;
         public float ty;
         public float offsetX;
@@ -56,7 +71,8 @@ public class NormalData {
         }
     }
 
-    public static class Inner extends Normal {
+    public static class Inner extends NormalGroup {
+
         public Inner() {
         }
 
@@ -65,7 +81,7 @@ public class NormalData {
         }
     }
 
-    public static class Center extends Normal {
+    public static class Center extends NormalGroup {
         public Center() {
         }
 
@@ -74,7 +90,7 @@ public class NormalData {
         }
     }
 
-    public static class Outer extends Normal {
+    public static class Outer extends NormalGroup {
         public Outer() {
         }
 

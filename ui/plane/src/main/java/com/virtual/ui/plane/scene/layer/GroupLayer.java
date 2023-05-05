@@ -6,9 +6,12 @@ import android.view.View;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 public abstract class GroupLayer<T extends Layer<?>, D> extends Layer<D> {
     protected final List<T> mChildLayers = new LinkedList<>();
+    protected final Lock mChildLock = new ReentrantLock();
     private Layer<?> mTouchChildLayer;
 
     public GroupLayer(D layerData) {
@@ -29,20 +32,31 @@ public abstract class GroupLayer<T extends Layer<?>, D> extends Layer<D> {
     @Override
     public void draw(Canvas canvas) {
         super.draw(canvas);
-        for (Layer<?> layer : mChildLayers) {
-            layer.draw(canvas);
+        try {
+            mChildLock.lock();
+            for (Layer<?> layer : mChildLayers) {
+                layer.draw(canvas);
+            }
+        } finally {
+            mChildLock.unlock();
         }
+
     }
 
     @Override
     public boolean isInner(float x, float y) {
         if (super.isInner(x, y)) {
             if (mTouchChildLayer == null) {
-                for (Layer<?> layer : mChildLayers) {
-                    if (layer.isInner(x, y)) {
-                        mTouchChildLayer = layer;
-                        return true;
+                try {
+                    mChildLock.lock();
+                    for (Layer<?> layer : mChildLayers) {
+                        if (layer.isInner(x, y)) {
+                            mTouchChildLayer = layer;
+                            return true;
+                        }
                     }
+                } finally {
+                    mChildLock.unlock();
                 }
             } else {
                 return mTouchChildLayer.isInner(x, y);
@@ -70,5 +84,31 @@ public abstract class GroupLayer<T extends Layer<?>, D> extends Layer<D> {
         } else {
             super.onClick();
         }
+    }
+
+    public void addLayer(T layer) {
+        layer.attached(mView);
+        try {
+            mChildLock.lock();
+            mChildLayers.add(layer);
+        } finally {
+            mChildLock.unlock();
+        }
+
+        postInvalidate();
+    }
+
+    public void removeLayer(T layer) {
+        if (mTouchChildLayer == layer) {
+            mTouchChildLayer = null;
+        }
+        try {
+            mChildLock.lock();
+            mChildLayers.remove(layer);
+        } finally {
+            mChildLock.unlock();
+        }
+
+        postInvalidate();
     }
 }

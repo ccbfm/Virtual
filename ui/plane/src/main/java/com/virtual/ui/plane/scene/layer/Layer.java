@@ -11,8 +11,10 @@ import androidx.annotation.CallSuper;
 public abstract class Layer<D> implements ILayer {
     protected D mLayerData;
     private Region mRegion;
-    private View mView;
+    protected View mView;
     protected boolean mIsInner = false;
+
+    private OnClickListener mClickListener;
 
     public Layer(D layerData) {
         mLayerData = layerData;
@@ -75,6 +77,13 @@ public abstract class Layer<D> implements ILayer {
     @Override
     public void onClick() {
         Log.d("BaseLayer", "onClick: " + this);
+        if (mClickListener != null) {
+            mClickListener.onClick(this);
+        }
+    }
+
+    public void setClickListener(OnClickListener clickListener) {
+        mClickListener = clickListener;
     }
 
     protected Paint createPaint() {
@@ -86,5 +95,9 @@ public abstract class Layer<D> implements ILayer {
     protected void setPaintStroke(Paint paint, float width) {
         paint.setStyle(Paint.Style.STROKE);
         paint.setStrokeWidth(width);
+    }
+
+    public interface OnClickListener {
+        void onClick(Layer<?> layer);
     }
 }

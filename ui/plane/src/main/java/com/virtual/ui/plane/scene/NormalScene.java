@@ -12,12 +12,14 @@ import android.graphics.Region;
 
 import androidx.annotation.NonNull;
 
+import com.virtual.ui.plane.scene.data.BodyData;
 import com.virtual.ui.plane.scene.data.LayerData;
 import com.virtual.ui.plane.scene.data.NormalData;
 import com.virtual.ui.plane.scene.layer.GroupLayer;
 import com.virtual.ui.plane.scene.layer.ILayer;
 import com.virtual.ui.plane.scene.layer.Layer;
 import com.virtual.util.math.MathCircle;
+import com.virtual.util.math.MathRandom;
 
 import java.util.List;
 import java.util.Random;
@@ -25,8 +27,10 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 @SuppressLint("ViewConstructor")
-public class NormalScene extends BaseScene {
+public class NormalScene extends BaseScene<Object> {
 
+    private NormalData mNormalData;
+    private Random mChildRandom;
     private Timer mTimer;
 
     public NormalScene(@NonNull Context context, int width, int height) {
@@ -34,7 +38,14 @@ public class NormalScene extends BaseScene {
     }
 
     @Override
+    public void onChange(Object o) {
+        
+    }
+
+    @Override
     protected void init() {
+        mNormalData = new NormalData();
+        mChildRandom = MathRandom.get("normal_scene_child_random");
         mTimer = new Timer();
     }
 
@@ -52,10 +63,33 @@ public class NormalScene extends BaseScene {
         float ior = (dx + ex);
         float cor = (dx + ex + ex);
 
-        layers.add(new MiddleLayer(new NormalData.Middle(mWidth, mHeight, cx, cy, dx, 0)));
-        layers.add(new InnerLayer(new NormalData.Inner(mWidth, mHeight, cx, cy, ior, dx)));
-        layers.add(new CenterLayer(new NormalData.Center(mWidth, mHeight, cx, cy, cor, ior)));
-        layers.add(new OuterLayer(new NormalData.Outer(mWidth, mHeight, cx, cy, cx, cor)));
+        NormalData.Middle middle = new NormalData.Middle(mWidth, mHeight, cx, cy, dx, 0);
+        mNormalData.middle = middle;
+        layers.add(new MiddleLayer(middle));
+
+        NormalData.Inner inner = new NormalData.Inner(mWidth, mHeight, cx, cy, ior, dx);
+        NormalData.NormalChild innerC1 = new NormalData.NormalChild();
+        innerC1.angle = 30f;
+        innerC1.body = new BodyData("石头", "shi_tou");
+        inner.childList.add(innerC1);
+        mNormalData.inner = inner;
+        layers.add(new InnerLayer(inner));
+
+        NormalData.Center center = new NormalData.Center(mWidth, mHeight, cx, cy, cor, ior);
+
+        NormalData.NormalChild centerC1 = new NormalData.NormalChild();
+        centerC1.active = true;
+        centerC1.body = new BodyData("叶凡", "ye_fan");
+        center.childList.add(centerC1);
+
+        mNormalData.center = center;
+        layers.add(new CenterLayer(center));
+
+        NormalData.Outer outer = new NormalData.Outer(mWidth, mHeight, cx, cy, cx, cor);
+        mNormalData.outer = outer;
+        layers.add(new OuterLayer(outer));
+
+
         layers.add(new BackgroundLayer(new LayerData(mWidth, mHeight)));
     }
 
@@ -125,7 +159,7 @@ public class NormalScene extends BaseScene {
             } else {
                 canvas.drawCircle(layerData.cx, layerData.cy, layerData.outRadius, mOPaint);
             }
-            canvas.drawText("赵", layerData.tx, layerData.ty, mTextPaint);
+            canvas.drawText(layerData.body.oneName, layerData.tx, layerData.ty, mTextPaint);
         }
     }
 
@@ -166,26 +200,40 @@ public class NormalScene extends BaseScene {
         }
     }
 
-    private static class InnerLayer extends NormalGroupLayer<NormalData.NormalChild, NormalData.Inner> {
+    private /*static*/ class InnerLayer extends NormalGroupLayer<NormalData.NormalChild, NormalData.Inner> {
         private final Paint mOPaint;
+        private final float mIr, mOr;
 
         public InnerLayer(NormalData.Inner layerData) {
             super(layerData);
             mOPaint = createPaint();
             setPaintStroke(mOPaint, 2);
             mOPaint.setColor(Color.parseColor("#808080"));
+
+            float ir = ((layerData.outRadius - layerData.innerRadius) / 2.0f);
+            mIr = layerData.outRadius - ir;
+            mOr = (ir / 5.0f) * 4;
         }
 
         @Override
         protected void initChildLayers(List<NormalLayer<NormalData.NormalChild>> layers) {
-            Random random = new Random();
             final NormalData.Inner layerData = mLayerData;
-            float ir = (layerData.outRadius - layerData.innerRadius) / 2.0f;
-            float or = (ir / 5.0f) * 4;
-            for (int i = 0; i < 5; i++) {
-                int angle = random.nextInt(360);
-                PointF pointF = MathCircle.pointByAngle(layerData.cx, layerData.cy, angle, layerData.outRadius - ir);
-                layers.add(new NormalChildLayer(new NormalData.NormalChild(layerData.width, layerData.height, pointF.x, pointF.y, or, 0)));
+            for (NormalData.NormalChild child : layerData.childList) {
+                float angle = child.angle;
+                if (child.angle == -1) {
+                    angle = mChildRandom.nextInt(360);
+                }
+                if (angle != -1) {
+                    PointF pointF = MathCircle.pointByAngle(layerData.cx, layerData.cy, angle, mIr);
+                    child.angle = angle;
+                    child.width = layerData.width;
+                    child.height = layerData.height;
+                    child.cx = pointF.x;
+                    child.cy = pointF.y;
+                    child.outRadius = mOr;
+                    child.innerRadius = 0;
+                    layers.add(new NormalChildLayer(child));
+                }
             }
         }
 
@@ -224,35 +272,44 @@ public class NormalScene extends BaseScene {
             setPaintStroke(mOPaint, 2);
             mOPaint.setColor(Color.BLACK);
 
-            mIr = (layerData.outRadius - layerData.innerRadius) / 2.0f;
-            mOr = (mIr / 5.0f) * 4;
+            float ir = ((layerData.outRadius - layerData.innerRadius) / 2.0f);
+            mIr = layerData.outRadius - ir;
+            mOr = (ir / 5.0f) * 4;
             mTimer.scheduleAtFixedRate(new TimerTask() {
                 @Override
                 public void run() {
-                    Random random = new Random();
+                    Random random = mChildRandom;
                     final NormalData.Center layerData = mLayerData;
-                    float ir = layerData.outRadius - mIr;
-                    for (NormalLayer<NormalData.NormalChild> child : mChildLayers) {
-                        NormalData.NormalChild childData = child.getLayerData();
+                    try {
+                        mChildLock.lock();
 
-                        float angle = childData.angle;
-                        int act = random.nextInt(3);
-                        if (act == 0) {
-                            continue;
-                        } else {
-                            int ra = random.nextInt(10);
-                            if (act == 1) {
-                                angle -= ra;
-                            } else {
-                                angle += ra;
+                        for (NormalLayer<NormalData.NormalChild> child : mChildLayers) {
+                            NormalData.NormalChild childData = child.getLayerData();
+                            if (!childData.active) {
+                                continue;
                             }
+                            float angle = childData.angle;
+                            int act = random.nextInt(3);
+                            if (act == 0) {
+                                continue;
+                            } else {
+                                int ra = random.nextInt(10);
+                                if (act == 1) {
+                                    angle -= ra;
+                                } else {
+                                    angle += ra;
+                                }
+                            }
+                            PointF pointF = MathCircle.pointByAngle(layerData.cx, layerData.cy, angle, mIr);
+                            childData.cx = pointF.x;
+                            childData.cy = pointF.y;
+                            childData.angle = angle;
+                            child.update(childData);
                         }
-                        PointF pointF = MathCircle.pointByAngle(layerData.cx, layerData.cy, angle, ir);
-                        childData.cx = pointF.x;
-                        childData.cy = pointF.y;
-                        childData.angle = angle;
-                        child.update(childData);
+                    } finally {
+                        mChildLock.unlock();
                     }
+
                     postInvalidate();
                 }
             }, 1000, 1000);
@@ -260,13 +317,23 @@ public class NormalScene extends BaseScene {
 
         @Override
         protected void initChildLayers(List<NormalLayer<NormalData.NormalChild>> layers) {
-            Random random = new Random();
             final NormalData.Center layerData = mLayerData;
-            float ir = layerData.outRadius - mIr;
-            for (int i = 0; i < 5; i++) {
-                int angle = random.nextInt(360);
-                PointF pointF = MathCircle.pointByAngle(layerData.cx, layerData.cy, angle, ir);
-                layers.add(new NormalChildLayer(new NormalData.NormalChild(layerData.width, layerData.height, pointF.x, pointF.y, mOr, 0, angle)));
+            for (NormalData.NormalChild child : layerData.childList) {
+                float angle = child.angle;
+                if (child.angle == -1) {
+                    angle = mChildRandom.nextInt(360);
+                }
+                if (angle != -1) {
+                    PointF pointF = MathCircle.pointByAngle(layerData.cx, layerData.cy, angle, mIr);
+                    child.angle = angle;
+                    child.width = layerData.width;
+                    child.height = layerData.height;
+                    child.cx = pointF.x;
+                    child.cy = pointF.y;
+                    child.outRadius = mOr;
+                    child.innerRadius = 0;
+                    layers.add(new NormalChildLayer(child));
+                }
             }
         }
 
@@ -295,26 +362,40 @@ public class NormalScene extends BaseScene {
 
     }
 
-    private static class OuterLayer extends NormalGroupLayer<NormalData.NormalChild, NormalData.Outer> {
+    private /*static*/ class OuterLayer extends NormalGroupLayer<NormalData.NormalChild, NormalData.Outer> {
         private final Paint mOPaint;
+        private final float mIr, mOr;
 
         public OuterLayer(NormalData.Outer layerData) {
             super(layerData);
             mOPaint = createPaint();
             setPaintStroke(mOPaint, 2);
             mOPaint.setColor(Color.GRAY);
+
+            float ir = ((layerData.outRadius - layerData.innerRadius) / 2.0f);
+            mIr = layerData.outRadius - ir;
+            mOr = (ir / 5.0f) * 4;
         }
 
         @Override
         protected void initChildLayers(List<NormalLayer<NormalData.NormalChild>> layers) {
             final NormalData.Outer layerData = mLayerData;
-            Random random = new Random();
-            float ir = (layerData.outRadius - layerData.innerRadius) / 2.0f;
-            float or = (ir / 5.0f) * 4;
-            for (int i = 0; i < 2; i++) {
-                int angle = random.nextInt(360);
-                PointF pointF = MathCircle.pointByAngle(layerData.cx, layerData.cy, angle, layerData.outRadius - ir);
-                layers.add(new NormalChildLayer(new NormalData.NormalChild(layerData.width, layerData.height, pointF.x, pointF.y, or, 0)));
+            for (NormalData.NormalChild child : layerData.childList) {
+                float angle = child.angle;
+                if (child.angle == -1) {
+                    angle = mChildRandom.nextInt(360);
+                }
+                if (angle != -1) {
+                    PointF pointF = MathCircle.pointByAngle(layerData.cx, layerData.cy, angle, mIr);
+                    child.angle = angle;
+                    child.width = layerData.width;
+                    child.height = layerData.height;
+                    child.cx = pointF.x;
+                    child.cy = pointF.y;
+                    child.outRadius = mOr;
+                    child.innerRadius = 0;
+                    layers.add(new NormalChildLayer(child));
+                }
             }
         }
 

@@ -8,13 +8,14 @@ import android.view.View;
 
 import androidx.annotation.NonNull;
 
+import com.virtual.ui.plane.IDataChange;
 import com.virtual.ui.plane.scene.layer.ILayer;
 
 import java.util.LinkedList;
 import java.util.List;
 
 @SuppressLint("ViewConstructor")
-public abstract class BaseScene extends View {
+public abstract class BaseScene<Data> extends View implements IDataChange<Data> {
 
     protected final int mWidth, mHeight;
     protected final List<ILayer> mLayers = new LinkedList<>();
