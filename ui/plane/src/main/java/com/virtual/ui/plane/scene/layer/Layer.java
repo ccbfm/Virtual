@@ -9,24 +9,31 @@ import android.view.View;
 import androidx.annotation.CallSuper;
 
 public abstract class Layer<D> implements ILayer {
-    protected D mLayerData;
+
+    protected int mWidth;
+    protected int mHeight;
+
+    protected D mData;
     private Region mRegion;
     protected View mView;
     protected boolean mIsInner = false;
 
     private OnClickListener mClickListener;
 
-    public Layer(D layerData) {
-        mLayerData = layerData;
+    public Layer(int width, int height) {
+        mWidth = width;
+        mHeight = height;
     }
 
     @CallSuper
-    public void update(D layerData) {
-        mLayerData = layerData;
+    public boolean updateData(D data) {
+        mData = data;
+        invalidate();
+        return true;
     }
 
-    public D getLayerData() {
-        return mLayerData;
+    public D getData() {
+        return mData;
     }
 
     @Override

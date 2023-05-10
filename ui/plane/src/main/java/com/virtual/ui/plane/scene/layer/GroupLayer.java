@@ -9,18 +9,19 @@ import java.util.List;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
-public abstract class GroupLayer<T extends Layer<?>, D> extends Layer<D> {
+public abstract class GroupLayer<T extends Layer<?>, GD> extends Layer<GD> {
     protected final List<T> mChildLayers = new LinkedList<>();
     protected final Lock mChildLock = new ReentrantLock();
     private Layer<?> mTouchChildLayer;
 
-    public GroupLayer(D layerData) {
-        super(layerData);
+    public GroupLayer(int width, int height) {
+        super(width, height);
     }
 
     @Override
     public void attached(View view) {
         super.attached(view);
+        mChildLayers.clear();
         initChildLayers(mChildLayers);
         for (Layer<?> layer : mChildLayers) {
             layer.attached(view);

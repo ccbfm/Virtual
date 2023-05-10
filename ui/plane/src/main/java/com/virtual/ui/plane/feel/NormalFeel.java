@@ -1,12 +1,19 @@
 package com.virtual.ui.plane.feel;
 
 import android.content.Context;
+import android.text.Layout;
 import android.text.method.ScrollingMovementMethod;
+import android.view.Gravity;
+import android.view.View;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.widget.AppCompatTextView;
 
-public class NormalFeel extends BaseFeel<AppCompatTextView, Object> {
+import com.virtual.ui.plane.feel.data.FeelData;
+
+public class NormalFeel extends BaseFeel<AppCompatTextView, FeelData> {
+    private boolean mHasText = false;
+    private boolean mIsScrolled = false;
 
     public NormalFeel(@NonNull Context context, int width, int height) {
         super(context, width, height);
@@ -19,19 +26,40 @@ public class NormalFeel extends BaseFeel<AppCompatTextView, Object> {
         textView.setVerticalScrollBarEnabled(true);
         textView.setMovementMethod(ScrollingMovementMethod.getInstance());
         textView.setTextSize(t_size);
-        textView.setText("[叶凡]来了");
+        textView.setGravity(Gravity.BOTTOM);
+        textView.setOnScrollChangeListener(new View.OnScrollChangeListener() {
+            @Override
+            public void onScrollChange(View v, int scrollX, int scrollY, int oldScrollX, int oldScrollY) {
+                AppCompatTextView tv = (AppCompatTextView) v;
+                Layout layout = tv.getLayout();
+                int lineCount = layout.getLineCount();
+                int lastLineTop = layout.getLineTop(lineCount);
+                int scrollTop = tv.getHeight() + scrollY;
+                //Log.d("NormalFeel", "onScrollChange lastLineTop " + lastLineTop + " " + scrollTop);
+                mIsScrolled = lastLineTop != scrollTop;
+                tv.setGravity(mIsScrolled ? Gravity.START : Gravity.BOTTOM);
+            }
+        });
         return textView;
     }
 
-    public void append(String text) {
+    public void appendText(String text) {
+        if (mHasText) {
+            mFeelView.append("\n");
+        } else {
+            mHasText = true;
+        }
+
         mFeelView.append(text);
-        mFeelView.append("\n");
+    }
+
+    public void clearText() {
+        mHasText = false;
+        mFeelView.setText("");
     }
 
     @Override
-    public void onChange(Object o) {
-        for (int i = 0; i < 40; i++) {
-            append("啦啦啦 " + i);
-        }
+    public void onChange(@NonNull FeelData feelData) {
+        appendText(feelData.format());
     }
 }
