@@ -71,7 +71,7 @@ dependencies {
 
     implementation rootProject.ext.library.appcompat
     implementation rootProject.ext.library.material
-    implementation project(path: ':ui:plane')
+    implementation project(path: ':evolute:ui')
 }
 
 tasks.whenTaskAdded { task ->

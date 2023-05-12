@@ -14,9 +14,6 @@ dependencyResolutionManagement {
 }
 rootProject.name = "Virtual"
 include ':app'
-include ':data'
-include ':ui:word'
-include ':control:word'
 include ':util:log'
 include ':util:context'
 include ':util:persist'
@@ -25,6 +22,6 @@ include ':util:prompt'
 include ':use'
 include ':util:socket'
 include ':util:common'
-include ':ui:plane'
-include ':evolute'
 include ':util:math'
+include ':evolute:evolute'
+include ':evolute:ui'

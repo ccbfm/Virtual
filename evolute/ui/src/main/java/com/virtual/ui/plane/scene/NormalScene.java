@@ -165,6 +165,7 @@ public class NormalScene extends BaseScene<NormalSceneData> {
                 PointF pointF = MathCircle.pointByAngle(mCx, mCy, angle, mIr);
                 child.angle = angle;
                 NormalChildLayer childLayer = new NormalChildLayer(mWidth, mHeight, pointF.x, pointF.y, mOr, 0);
+                childLayer.attached(mView);
                 childLayer.updateData(child);
                 mChildLayerMap.put(child.key, childLayer);
                 return childLayer;
