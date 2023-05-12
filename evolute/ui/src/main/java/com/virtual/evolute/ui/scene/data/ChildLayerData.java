@@ -1,8 +1,8 @@
-package com.virtual.ui.plane.scene.data;
+package com.virtual.evolute.ui.scene.data;
 
 public class ChildLayerData extends LayerData {
     public int active;
-    public float angle;
+    public float angle = -1;
 
     public boolean isActive() {
         return active > 0;

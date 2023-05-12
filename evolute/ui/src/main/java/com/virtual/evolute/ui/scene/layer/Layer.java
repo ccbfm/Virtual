@@ -1,4 +1,4 @@
-package com.virtual.ui.plane.scene.layer;
+package com.virtual.evolute.ui.scene.layer;
 
 import android.graphics.Canvas;
 import android.graphics.Paint;
@@ -27,8 +27,15 @@ public abstract class Layer<D> implements ILayer {
 
     @CallSuper
     public boolean updateData(D data) {
+        return updateData(data, true);
+    }
+
+    @CallSuper
+    public boolean updateData(D data, boolean invalidate) {
         mData = data;
-        invalidate();
+        if (invalidate) {
+            invalidate();
+        }
         return true;
     }
 
@@ -40,6 +47,11 @@ public abstract class Layer<D> implements ILayer {
     public void attached(View view) {
         mView = view;
         mRegion = initRegion();
+    }
+
+    @Override
+    public void focusChanged(boolean focus) {
+
     }
 
     @Override

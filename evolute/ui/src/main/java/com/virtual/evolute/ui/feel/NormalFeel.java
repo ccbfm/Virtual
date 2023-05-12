@@ -1,4 +1,4 @@
-package com.virtual.ui.plane.feel;
+package com.virtual.evolute.ui.feel;
 
 import android.content.Context;
 import android.text.Layout;
@@ -9,7 +9,7 @@ import android.view.View;
 import androidx.annotation.NonNull;
 import androidx.appcompat.widget.AppCompatTextView;
 
-import com.virtual.ui.plane.feel.data.FeelData;
+import com.virtual.evolute.ui.feel.data.FeelData;
 
 public class NormalFeel extends BaseFeel<AppCompatTextView, FeelData> {
     private boolean mHasText = false;

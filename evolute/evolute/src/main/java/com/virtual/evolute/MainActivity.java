@@ -4,7 +4,7 @@ import android.os.Bundle;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.virtual.ui.plane.PlaneManager;
+import com.virtual.evolute.ui.PlaneManager;
 
 public class MainActivity extends AppCompatActivity {
 

@@ -1,4 +1,4 @@
-package com.virtual.ui.plane.scene;
+package com.virtual.evolute.ui.scene;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
@@ -8,8 +8,8 @@ import android.view.View;
 
 import androidx.annotation.NonNull;
 
-import com.virtual.ui.plane.IDataChange;
-import com.virtual.ui.plane.scene.layer.ILayer;
+import com.virtual.evolute.ui.IDataChange;
+import com.virtual.evolute.ui.scene.layer.ILayer;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -36,6 +36,15 @@ public abstract class BaseScene<Data> extends View implements IDataChange<Data> 
 
     }
 
+    protected void focusChanged(boolean focus) {
+        List<ILayer> layers = mLayers;
+        if (layers != null) {
+            for (ILayer layer : layers) {
+                layer.focusChanged(focus);
+            }
+        }
+    }
+
     @Override
     protected void onAttachedToWindow() {
         super.onAttachedToWindow();
@@ -45,6 +54,12 @@ public abstract class BaseScene<Data> extends View implements IDataChange<Data> 
                 layer.attached(this);
             }
         }
+    }
+
+    @Override
+    public void onWindowFocusChanged(boolean hasWindowFocus) {
+        super.onWindowFocusChanged(hasWindowFocus);
+        focusChanged(hasWindowFocus);
     }
 
     @Override

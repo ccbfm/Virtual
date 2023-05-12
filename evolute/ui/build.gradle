@@ -3,7 +3,7 @@ plugins {
 }
 
 android {
-    namespace 'com.virtual.ui.plane'
+    namespace 'com.virtual.evolute.ui'
     compileSdk rootProject.ext.android.compileSdk
 
     defaultConfig {

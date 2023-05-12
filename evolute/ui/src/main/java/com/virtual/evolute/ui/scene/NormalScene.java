@@ -1,4 +1,4 @@
-package com.virtual.ui.plane.scene;
+package com.virtual.evolute.ui.scene;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
@@ -9,17 +9,18 @@ import android.graphics.Path;
 import android.graphics.PointF;
 import android.graphics.RectF;
 import android.graphics.Region;
+import android.util.Log;
 
 import androidx.annotation.CallSuper;
 import androidx.annotation.NonNull;
 
-import com.virtual.ui.plane.scene.data.ChildLayerData;
-import com.virtual.ui.plane.scene.data.GroupLayerData;
-import com.virtual.ui.plane.scene.data.LayerData;
-import com.virtual.ui.plane.scene.data.NormalSceneData;
-import com.virtual.ui.plane.scene.layer.GroupLayer;
-import com.virtual.ui.plane.scene.layer.ILayer;
-import com.virtual.ui.plane.scene.layer.Layer;
+import com.virtual.evolute.ui.scene.data.ChildLayerData;
+import com.virtual.evolute.ui.scene.data.GroupLayerData;
+import com.virtual.evolute.ui.scene.data.LayerData;
+import com.virtual.evolute.ui.scene.data.NormalSceneData;
+import com.virtual.evolute.ui.scene.layer.GroupLayer;
+import com.virtual.evolute.ui.scene.layer.ILayer;
+import com.virtual.evolute.ui.scene.layer.Layer;
 import com.virtual.util.math.MathCircle;
 import com.virtual.util.math.MathRandom;
 
@@ -34,7 +35,6 @@ import java.util.TimerTask;
 public class NormalScene extends BaseScene<NormalSceneData> {
 
     private Random mChildRandom;
-    private Timer mTimer;
     private MiddleLayer mMiddleLayer;
     private InnerLayer mInnerLayer;
     private CenterLayer mCenterLayer;
@@ -63,13 +63,13 @@ public class NormalScene extends BaseScene<NormalSceneData> {
     @Override
     protected void init() {
         mChildRandom = MathRandom.get("normal_scene_child_random");
-        mTimer = new Timer();
     }
 
     @Override
     protected void destroy() {
-        mTimer.cancel();
+
     }
+
 
     @Override
     protected void initLayers(List<ILayer> layers) {
@@ -165,8 +165,7 @@ public class NormalScene extends BaseScene<NormalSceneData> {
                 PointF pointF = MathCircle.pointByAngle(mCx, mCy, angle, mIr);
                 child.angle = angle;
                 NormalChildLayer childLayer = new NormalChildLayer(mWidth, mHeight, pointF.x, pointF.y, mOr, 0);
-                childLayer.attached(mView);
-                childLayer.updateData(child);
+                childLayer.updateData(child, false);
                 mChildLayerMap.put(child.key, childLayer);
                 return childLayer;
             }
@@ -177,21 +176,30 @@ public class NormalScene extends BaseScene<NormalSceneData> {
         public boolean updateData(GroupLayerData data) {
             //Log.d("NormalGroupLayer", "updateData " + data);
             if (data.childList != null) {
-                List<NormalChildLayer> layers = new LinkedList<>();
+                List<NormalChildLayer> addLayers = new LinkedList<>();
+                List<NormalChildLayer> updateLayers = new LinkedList<>();
                 for (ChildLayerData child : data.childList) {
-                    NormalChildLayer childLayer = mChildLayerMap.get(child.key);
+                    NormalChildLayer childLayer = mChildLayerMap.remove(child.key);
                     if (childLayer != null) {
-                        childLayer.updateData(child);
-                        layers.add(childLayer);
+                        ChildLayerData oldChildData = childLayer.getData();
+                        child.angle = oldChildData.angle;
+                        childLayer.updateData(child, false);
+                        updateLayers.add(childLayer);
                     } else {
                         childLayer = createChildLayer(child);
                         if (childLayer != null) {
-                            layers.add(childLayer);
+                            addLayers.add(childLayer);
                         }
                     }
                 }
+                for (NormalChildLayer childLayer : mChildLayerMap.values()) {
+                    removeLayer(childLayer);
+                }
                 mChildLayerMap.clear();
-                for (NormalChildLayer childLayer : layers) {
+                for (NormalChildLayer childLayer : updateLayers) {
+                    mChildLayerMap.put(childLayer.getData().key, childLayer);
+                }
+                for (NormalChildLayer childLayer : addLayers) {
                     addLayer(childLayer);
                     mChildLayerMap.put(childLayer.getData().key, childLayer);
                 }
@@ -328,6 +336,7 @@ public class NormalScene extends BaseScene<NormalSceneData> {
 
     private /*static*/ class CenterLayer extends NormalGroupLayer {
         private final Paint mOPaint;
+        private Timer mTimer;
 
         public CenterLayer(int width, int height, float cx, float cy, float outRadius, float innerRadius) {
             super(width, height, cx, cy, outRadius, innerRadius);
@@ -336,6 +345,20 @@ public class NormalScene extends BaseScene<NormalSceneData> {
             setPaintStroke(mOPaint, 2);
             mOPaint.setColor(Color.BLACK);
 
+        }
+
+        @Override
+        public void focusChanged(boolean focus) {
+            if (focus) {
+                scheduleTask();
+            } else {
+                mTimer.cancel();
+                mTimer = null;
+            }
+        }
+
+        private void scheduleTask() {
+            mTimer = new Timer();
             mTimer.scheduleAtFixedRate(new TimerTask() {
                 @Override
                 public void run() {
@@ -350,6 +373,7 @@ public class NormalScene extends BaseScene<NormalSceneData> {
                                 continue;
                             }
                             float angle = childData.angle;
+                            //Log.d("CenterLayer", "mChildLayers angle " + angle);
                             int act = random.nextInt(3);
                             if (act == 0) {
                                 continue;

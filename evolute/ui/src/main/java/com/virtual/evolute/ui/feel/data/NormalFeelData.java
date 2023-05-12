@@ -1,4 +1,4 @@
-package com.virtual.ui.plane.feel.data;
+package com.virtual.evolute.ui.feel.data;
 
 public class NormalFeelData extends FeelData {
 

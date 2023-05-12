@@ -1,4 +1,4 @@
-package com.virtual.ui.plane.feel;
+package com.virtual.evolute.ui.feel;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
@@ -7,7 +7,7 @@ import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
 
-import com.virtual.ui.plane.IDataChange;
+import com.virtual.evolute.ui.IDataChange;
 
 @SuppressLint("ViewConstructor")
 public abstract class BaseFeel<T extends View, Data> implements IDataChange<Data> {
