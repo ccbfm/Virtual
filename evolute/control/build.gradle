@@ -29,4 +29,7 @@ dependencies {
 
     implementation rootProject.ext.library.appcompat
     implementation rootProject.ext.library.material
+    implementation project(path: ':evolute:data')
+    implementation project(path: ':util:common')
+    implementation project(path: ':util:math')
 }
