@@ -1,12 +1,10 @@
 package com.virtual.evolute.control.produce;
 
-import com.virtual.evolute.data.Active;
 import com.virtual.evolute.data.Place;
 import com.virtual.evolute.data.World;
 
 import java.util.HashMap;
 import java.util.LinkedList;
-import java.util.List;
 
 public abstract class WorldProduce implements IProduce<World> {
 

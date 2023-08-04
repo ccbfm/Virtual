@@ -131,7 +131,7 @@ public final class VWorkPool {
     }
 
     public void clearConnect(String name, int userId) {
-        recordConnect(name, userId, null);
+        removeConnect(name, userId);
     }
 
     public void toStringConnect() {

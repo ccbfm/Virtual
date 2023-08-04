@@ -76,6 +76,7 @@ dependencies {
     implementation project(path: ':util:thread')
     implementation project(path: ':util:socket')
     implementation project(path: ':util:common')
+    implementation project(path: ':mutual:simple_launcher')
 }
 
 tasks.whenTaskAdded {task ->
