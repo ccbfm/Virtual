@@ -29,4 +29,7 @@ dependencies {
 
     implementation rootProject.ext.library.appcompat
     implementation rootProject.ext.library.material
+    implementation project(path: ':util:persist')
+    implementation project(path: ':util:thread')
+    implementation project(path: ':util:context')
 }

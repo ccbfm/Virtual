@@ -1,3 +1,6 @@
-<resources>
-
+<resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="ExtraTranslation">
+    <string name="app_menu_detail">详情</string>
+    <string name="app_menu_add">添加</string>
+    <string name="app_menu_remove">移除</string>
+    <string name="search_app_hint">搜索应用</string>
 </resources>
