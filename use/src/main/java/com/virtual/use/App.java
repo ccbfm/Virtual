@@ -20,5 +20,21 @@ public class App extends Application {
                 .build();
         VLogExported.init("com.virtual.app");
         VPersistExported.init("com.virtual.app");
+        VLogExported.d("App", "onCreate");
+
+        new Thread(){
+            @Override
+            public void run() {
+                try {
+                    while (true){
+                        Thread.sleep(1000);
+                        VLogExported.d("App", "onCreate-run");
+                    }
+                } catch (Throwable throwable){
+                    VLogExported.d("App", "onCreate-run throwable " + throwable.getMessage());
+                }
+            }
+        }.start();
     }
+
 }

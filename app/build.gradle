@@ -77,6 +77,7 @@ dependencies {
     implementation project(path: ':util:socket')
     implementation project(path: ':util:common')
     implementation project(path: ':mutual:live_wallpaper')
+    implementation project(path: ':util:network')
 }
 
 tasks.whenTaskAdded {task ->

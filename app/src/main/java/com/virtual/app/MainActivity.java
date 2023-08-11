@@ -1,19 +1,25 @@
 package com.virtual.app;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.os.Process;
 import android.util.Log;
 import android.view.View;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.virtual.util.context.VResources;
 import com.virtual.util.log.VLog;
-import com.virtual.util.log.VLogExported;
+import com.virtual.util.network.VNetwork;
+import com.virtual.util.network.VNetworkCallback;
 import com.vritual.mutual.live.wallpaper.VirtualWallpaper;
 
+import java.io.IOException;
 import java.util.Arrays;
+
+import okhttp3.ResponseBody;
+import retrofit2.Call;
+import retrofit2.Response;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -33,12 +39,14 @@ public class MainActivity extends AppCompatActivity {
                 /*Intent mIntent = new Intent(Settings.ACTION_HOME_SETTINGS);
                 startActivity(mIntent);*/
 
-                VirtualWallpaper.start(MainActivity.this);
-
+                //VirtualWallpaper.start(MainActivity.this);
                 /*Intent intent = new Intent("android.intent.action.MAIN_USE");
                 intent.setPackage("com.virtual.use");
                 //intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                 MainActivity.this.startActivity(intent);*/
+                VNetwork.setCleartext();
+                VNetwork.init();
+
             }
         });
 
