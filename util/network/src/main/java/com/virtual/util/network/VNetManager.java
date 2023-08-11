@@ -31,26 +31,33 @@ public class VNetManager {
     }
 
     public <Api> boolean putApi(Class<Api> classApi) {
-        if (mRetrofit != null) {
-            Api api = mRetrofit.create(classApi);
-            putApi(classApi, api);
+        Api api = getApi(classApi);
+        if (api == null) {
+            if (mRetrofit != null) {
+                api = mRetrofit.create(classApi);
+                putApi(classApi, api);
+                return true;
+            }
+        } else {
             return true;
         }
         return false;
     }
 
     public <Api> void putApi(Class<Api> classApi, Api api) {
-        mApiMap.put(classApi, api);
+        mApiMap.putIfAbsent(classApi, api);
     }
 
     public void initDefault(OkHttpClient client) {
-        Retrofit.Builder builder = new Retrofit.Builder();
-        builder.baseUrl("https://abc.com");
-        if (client != null) {
-            builder.client(client);
+        if (mRetrofit == null) {
+            Retrofit.Builder builder = new Retrofit.Builder();
+            builder.baseUrl("https://abc.com");
+            if (client != null) {
+                builder.client(client);
+            }
+            builder.addConverterFactory(GsonConverterFactory.create());
+            mRetrofit = builder.build();
         }
-        builder.addConverterFactory(GsonConverterFactory.create());
-        mRetrofit = builder.build();
     }
 
 

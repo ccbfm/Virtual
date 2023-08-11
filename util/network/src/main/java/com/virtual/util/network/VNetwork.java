@@ -33,13 +33,13 @@ public class VNetwork {
     private static boolean checkUrl(String url) {
         if (TextUtils.isEmpty(url)) {
             Log.e("VNetwork", "checkUrl url is null.");
-            return false;
+            return true;
         }
         if (!url.startsWith("http")) {
             Log.e("VNetwork", "checkUrl url startsWith not http.");
-            return false;
+            return true;
         }
-        return true;
+        return false;
     }
 
     public static String get(String url) {
@@ -51,7 +51,7 @@ public class VNetwork {
     }
 
     public static String get(String url, Map<String, String> params, Map<String, String> headers) {
-        if (!checkUrl(url)) {
+        if (checkUrl(url)) {
             return null;
         }
         if (params == null) {
@@ -87,7 +87,7 @@ public class VNetwork {
                               Map<String, String> params,
                               Map<String, String> headers,
                               VNetworkCallback callback) {
-        if (!checkUrl(url)) {
+        if (checkUrl(url)) {
             return;
         }
         if (params == null) {
@@ -111,7 +111,7 @@ public class VNetwork {
     }
 
     public static String post(String url, Map<String, String> params, Map<String, String> headers) {
-        if (!checkUrl(url)) {
+        if (checkUrl(url)) {
             return null;
         }
         if (params == null) {
@@ -147,7 +147,7 @@ public class VNetwork {
                                Map<String, String> params,
                                Map<String, String> headers,
                                VNetworkCallback callback) {
-        if (!checkUrl(url)) {
+        if (checkUrl(url)) {
             return;
         }
         if (params == null) {
