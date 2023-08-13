@@ -17,6 +17,10 @@ public abstract class VServer extends VWork {
     @NonNull
     public abstract String address();
 
+    /**
+     * A valid port value is between 0 and 65535
+     * @return port
+     */
     public abstract int port();
 
     protected Looper acceptLooper() {

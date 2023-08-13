@@ -29,7 +29,7 @@ public abstract class VLocalWork implements Runnable {
 
             doWork();
         } catch (IOException exception) {
-            Log.e("VLocalWork", "run IOException: " + exception.getMessage());
+            Log.e("VLocalWork", "run IOException: ", exception);
             doThrowable();
         } catch (Throwable throwable) {
             Log.e("VLocalWork", "run Throwable: ", throwable);

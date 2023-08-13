@@ -1,3 +1,5 @@
+//项目build.gradle
+//apply from: "config.gradle"
 ext {
     android = [
             compileSdk: 33,
@@ -7,11 +9,19 @@ ext {
 
     library_version = [
             appcompat: "1.6.1",
-            material : "1.8.0"
+            material : "1.8.0",
+            retrofit : "2.9.0",
+            okhttp   : "4.11.0",
+            gson     : "2.10.1"
     ]
 
     library = [
-            appcompat: "androidx.appcompat:appcompat:$library_version.appcompat",
-            material : "com.google.android.material:material:$library_version.material"
+            appcompat              : "androidx.appcompat:appcompat:$library_version.appcompat",
+            material               : "com.google.android.material:material:$library_version.material",
+            retrofit               : "com.squareup.retrofit2:retrofit:$library_version.retrofit",
+            retrofit_converter_gson: "com.squareup.retrofit2:converter-gson:$library_version.retrofit",
+            okhttp                 : "com.squareup.okhttp3:okhttp:$library_version.okhttp",
+            okhttp_interceptor     : "com.squareup.okhttp3:logging-interceptor:$library_version.okhttp",
+            gson                   : "com.google.code.gson:gson:$library_version.gson"
     ]
 }

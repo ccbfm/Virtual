@@ -28,8 +28,14 @@ public abstract class VClient extends VWork {
     private BufferedReader mReader;
 
     @NonNull
-    protected abstract String hostname();
+    protected String hostname() {
+        return "localhost";
+    }
 
+    /**
+     * A valid port value is between 0 and 65535
+     * @return port
+     */
     protected abstract int port();
 
     @NonNull
@@ -58,7 +64,7 @@ public abstract class VClient extends VWork {
 
     private void checkHandlerThread() {
         if (mHandlerThread == null) {
-            mHandlerThread = new HandlerThread("server-connect");
+            mHandlerThread = new HandlerThread("client-connect");
             mHandlerThread.start();
         }
     }

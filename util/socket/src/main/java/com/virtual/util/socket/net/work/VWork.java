@@ -29,7 +29,7 @@ public abstract class VWork implements Runnable {
 
             doWork();
         } catch (IOException exception) {
-            Log.e("VWork", "run IOException: " + exception.getMessage());
+            Log.e("VWork", "run IOException: ", exception);
             doThrowable();
         } catch (Throwable throwable) {
             Log.e("VWork", "run Throwable: ", throwable);

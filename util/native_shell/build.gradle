@@ -3,7 +3,7 @@ plugins {
 }
 
 android {
-    namespace 'com.virtual.util.network'
+    namespace 'com.virtual.util.native_shell'
     compileSdk rootProject.ext.android.compileSdk
 
     defaultConfig {
@@ -11,12 +11,23 @@ android {
         targetSdk rootProject.ext.android.targetSdk
 
         consumerProguardFiles "consumer-rules.pro"
+        externalNativeBuild {
+            cmake {
+                cppFlags ""
+            }
+        }
     }
 
     buildTypes {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }
+    externalNativeBuild {
+        cmake {
+            path "src/main/cpp/CMakeLists.txt"
+            version "3.22.1"
         }
     }
     compileOptions {
@@ -28,7 +39,4 @@ android {
 dependencies {
 
     implementation rootProject.ext.library.appcompat
-    implementation rootProject.ext.library.retrofit
-    implementation rootProject.ext.library.retrofit_converter_gson
-    implementation rootProject.ext.library.okhttp_interceptor
 }

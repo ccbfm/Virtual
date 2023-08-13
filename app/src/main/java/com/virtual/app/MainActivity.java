@@ -47,6 +47,24 @@ public class MainActivity extends AppCompatActivity {
                 VNetwork.setCleartext();
                 VNetwork.init();
 
+                VNetwork.runPost("http://111.223.15.84:3307/api/device/getappversion",
+                        new VNetworkCallback(){
+                            @Override
+                            public void onResponse(@NonNull Call<ResponseBody> call, @NonNull Response<ResponseBody> response) {
+                                super.onResponse(call, response);
+                                try {
+                                    Log.d("Virtual", "app onClick runGet " + response.body().string());
+                                } catch (IOException e) {
+                                    throw new RuntimeException(e);
+                                }
+                            }
+                        });
+                /*new Thread(){
+                    @Override
+                    public void run() {
+                        Log.d("Virtual", "app onClick get " + VNetwork.post("http://111.223.15.84:3307/api/device/getappversion"));
+                    }
+                }.start();*/
             }
         });
 
