@@ -28,5 +28,4 @@ android {
 dependencies {
 
     implementation rootProject.ext.library.appcompat
-    implementation project(path: ':util:context')
 }

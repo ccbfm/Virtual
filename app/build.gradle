@@ -71,13 +71,14 @@ dependencies {
     implementation rootProject.ext.library.appcompat
     implementation rootProject.ext.library.material
     implementation project(path: ':util:log')
-    implementation project(path: ':util:persist')
-    implementation project(path: ':util:context')
-    implementation project(path: ':util:thread')
+//    implementation project(path: ':util:persist')
+//    implementation project(path: ':util:context')
+//    implementation project(path: ':util:thread')
     implementation project(path: ':util:socket')
-    implementation project(path: ':util:common')
-    implementation project(path: ':mutual:live_wallpaper')
-    implementation project(path: ':util:network')
+//    implementation project(path: ':util:common')
+//    implementation project(path: ':mutual:live_wallpaper')
+    //implementation project(path: ':util:network')
+    implementation files('../libs/network-release.aar')
 
     implementation rootProject.ext.library.retrofit
     implementation rootProject.ext.library.retrofit_converter_gson

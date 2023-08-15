@@ -5,29 +5,28 @@ import android.util.Log;
 import com.virtual.util.log.VLevel;
 import com.virtual.util.log.VLevelString;
 import com.virtual.util.log.VLogConfig;
-import com.virtual.util.persist.file.VFile;
-import com.virtual.util.persist.file.VFileIO;
-import com.virtual.util.thread.VThread;
-import com.virtual.util.thread.model.VSimpleTask;
-import com.virtual.util.thread.pool.VThreadPoolExecutor;
 
 import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.Calendar;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public class VSaveLog extends VBaseLog {
     @VLevel
     protected final int mSaveLevel;
     protected final String mSaveRootDir;
-    protected final VThreadPoolExecutor mExecutor;
+    protected final ExecutorService mExecutor;
     private static final int MAX_FILE_SIZE = 1024 * 1024 * 5;
 
     public VSaveLog() {
         mSaveLevel = VLogConfig.instance().getSaveLevel();
         mSaveRootDir = VLogConfig.instance().getSaveRootDir();
-        mExecutor = VThread.getFixedPool(1, false);
+        mExecutor = Executors.newSingleThreadExecutor();
     }
 
-    protected static class SaveTask extends VSimpleTask<Boolean> {
+    protected static class SaveTask implements Runnable {
         private final VSaveLog saveLog;
         private final String level;
         private final String tag;
@@ -41,15 +40,40 @@ public class VSaveLog extends VBaseLog {
         }
 
         @Override
-        protected Boolean doTask() throws Throwable {
+        public void run() {
             String content = this.saveLog.formatLog(this.level, this.tag, this.msg);
-            return VFileIO.writeFileFromString(this.saveLog.getOrCreateSaveFile(), content, true);
+            this.saveLog.writeFileFromString(this.saveLog.getOrCreateSaveFile(), content, true);
         }
+    }
 
-        @Override
-        protected void onSuccess(Boolean result) {
-            //Log.d("SaveTask", "onSuccess-result=" + result);
+    private boolean writeFileFromString(File file, String content, boolean append) {
+        if (file == null || content == null) return false;
+        if (!createOrExistsFile(file)) return false;
+        try (FileWriter fileWriter = new FileWriter(file, append)) {
+            fileWriter.write(content);
+            return true;
+        } catch (IOException e) {
+            e.printStackTrace();
+            return false;
         }
+    }
+
+    private boolean createOrExistsFile(File file) {
+        if (file == null) return false;
+        // 如果存在，是文件则返回true，是目录则返回false
+        if (file.exists()) return file.isFile();
+        if (!createOrExistsDir(file.getParentFile())) return false;
+        try {
+            return file.createNewFile();
+        } catch (IOException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    private boolean createOrExistsDir(File file) {
+        // 如果存在，是目录则返回true，是文件则返回false，不存在则返回是否创建成功
+        return file != null && (file.exists() ? file.isDirectory() : file.mkdirs());
     }
 
     protected boolean checkSave(@VLevel int saveLevel) {
@@ -63,7 +87,7 @@ public class VSaveLog extends VBaseLog {
 
     protected void saveLogToFile(@VLevel int level, String tag, String msg) {
         String levelStr = VLevelString.levelString(level);
-        VThread.execute(mExecutor, new SaveTask(this, levelStr, tag, msg));
+        mExecutor.execute(new SaveTask(this, levelStr, tag, msg));
     }
 
     private String repair0(int num) {

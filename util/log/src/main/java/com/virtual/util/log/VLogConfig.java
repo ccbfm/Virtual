@@ -1,5 +1,6 @@
 package com.virtual.util.log;
 
+import android.content.Context;
 import android.text.TextUtils;
 import android.util.Log;
 
@@ -7,9 +8,9 @@ import androidx.annotation.NonNull;
 
 import com.virtual.util.log.flavor.VPrintLog;
 import com.virtual.util.log.flavor.VSaveLog;
-import com.virtual.util.persist.file.VFilePath;
 
 import java.io.File;
+import java.lang.ref.WeakReference;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -26,6 +27,14 @@ public final class VLogConfig {
         return Singleton.INSTANCE;
     }
 
+    public void defaultConfig(@NonNull Context context, String tag, boolean debug) {
+        createBuilder(context)
+                .setLogTag(tag)
+                .setDebugLevel(debug ? VLevel.D : VLevel.NONE)
+                .setSaveLevel(VLevel.W)
+                .build();
+    }
+
     private String mLogTag = "Default";
     @VLevel
     private int mDebugLevel = VLevel.NONE;
@@ -35,6 +44,8 @@ public final class VLogConfig {
     private String mSaveRootDir;
 
     private final List<IVLog> mILogs = new LinkedList<>();
+
+    private Context mContext;
 
     private void setLogTag(String logTag) {
         mLogTag = logTag;
@@ -58,6 +69,10 @@ public final class VLogConfig {
 
     private void addAllILog(List<IVLog> iLogs) {
         mILogs.addAll(iLogs);
+    }
+
+    private void setContext(Context context) {
+        mContext = context.getApplicationContext();
     }
 
     public String getLogTag() {
@@ -84,15 +99,21 @@ public final class VLogConfig {
         return mILogs;
     }
 
-    public Builder createBuilder() {
-        return new Builder(this);
+    public Context getContext() {
+        return mContext;
+    }
+
+    public Builder createBuilder(@NonNull Context context) {
+        return new Builder(this, context);
     }
 
     public static final class Builder {
         private final VLogConfig logConfig;
+        private final Context context;
 
-        public Builder(VLogConfig logConfig) {
+        public Builder(VLogConfig logConfig, Context context) {
             this.logConfig = logConfig;
+            this.context = context;
         }
 
         private String logTag = "Default";
@@ -155,8 +176,11 @@ public final class VLogConfig {
                 this.logConfig.setSaveLevel(this.saveLevel);
 
                 String saveRootDir = this.saveRootDir;
+                if (TextUtils.isEmpty(saveRootDir) && this.context != null) {
+                    saveRootDir = this.context.getExternalFilesDir("Log_" + this.logTag).getAbsolutePath();
+                }
                 if (TextUtils.isEmpty(saveRootDir)) {
-                    saveRootDir = VFilePath.getExternalFilesDir("Log_" + this.logTag).getAbsolutePath();
+                    throw new NullPointerException("Path saveRootDir is null.");
                 }
                 this.logConfig.setSaveRootDir(saveRootDir);
 
@@ -169,6 +193,7 @@ public final class VLogConfig {
             if (this.otherILogs != null) {
                 this.logConfig.addAllILog(this.otherILogs);
             }
+            this.logConfig.setContext(this.context);
         }
     }
 

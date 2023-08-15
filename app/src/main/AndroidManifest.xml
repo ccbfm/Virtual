@@ -28,11 +28,11 @@
             android:exported="true"
             tools:ignore="ExportedContentProvider" />
 
-        <provider
+        <!--<provider
             android:name="com.virtual.util.persist.provider.VPersistProvider"
             android:authorities="${applicationId}.provider.VPersistProvider"
             android:exported="true"
-            tools:ignore="ExportedContentProvider" />
+            tools:ignore="ExportedContentProvider" />-->
     </application>
 
 </manifest>

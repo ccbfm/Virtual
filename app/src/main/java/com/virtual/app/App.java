@@ -12,7 +12,7 @@ public class App extends Application {
     public void onCreate() {
         super.onCreate();
         Log.d("App", "onCreate");
-        VLogConfig.instance().createBuilder()
+        VLogConfig.instance().createBuilder(this)
                 .setLogTag("Virtual")
                 .setDebugLevel(BuildConfig.DEBUG ? VLevel.D : VLevel.NONE)
                 .setSaveLevel(VLevel.W)

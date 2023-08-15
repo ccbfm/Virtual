@@ -3,9 +3,8 @@ package com.virtual.util.persist.sp;
 import android.content.Context;
 import android.content.SharedPreferences;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-
-import com.virtual.util.context.VContextHolder;
 
 import java.util.HashMap;
 import java.util.Set;
@@ -27,10 +26,10 @@ public class VSpConfig {
     private final HashMap<String, Builder> mSpMap = new HashMap<>();
 
 
-    public Builder getSp(String name) {
+    public Builder getSp(@NonNull Context context, String name) {
         Builder builder = mSpMap.get(name);
         if (builder == null) {
-            builder = new Builder(name);
+            builder = new Builder(context, name);
             mSpMap.put(name, builder);
         }
         return builder;
@@ -41,9 +40,9 @@ public class VSpConfig {
         String name;
         SharedPreferences sp;
 
-        Builder(String name) {
+        Builder(@NonNull Context context, String name) {
             this.name = name;
-            this.sp = VContextHolder.instance().getContext().getSharedPreferences(name, Context.MODE_PRIVATE);
+            this.sp = context.getSharedPreferences(name, Context.MODE_PRIVATE);
         }
 
         public void putString(String key, @Nullable String value) {

@@ -81,9 +81,9 @@ public class AppAdapter extends RecyclerView.Adapter<AppHolder> implements AppLo
                 @Override
                 public void onClick(View v) {
                     if (app.hasWorkplace) {
-                        AppLoad.instance().removeWorkspaceApp(app);
+                        AppLoad.instance().removeWorkspaceApp(mContext, app);
                     } else {
-                        AppLoad.instance().addWorkspaceApp(app);
+                        AppLoad.instance().addWorkspaceApp(mContext, app);
                     }
                     notifyItemChanged(holder.getAdapterPosition());
                 }

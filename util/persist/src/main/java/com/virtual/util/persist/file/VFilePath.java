@@ -6,8 +6,6 @@ import android.os.Environment;
 import androidx.annotation.IntDef;
 import androidx.annotation.Nullable;
 
-import com.virtual.util.context.VContextHolder;
-
 import java.io.File;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -55,42 +53,20 @@ public final class VFilePath {
         return Environment.getRootDirectory();
     }
 
-
-    public static String getPackageCodePath() {
-        return getPackageCodePath(VContextHolder.instance().getContext());
-    }
-
     public static String getPackageCodePath(Context context) {
         return context.getPackageCodePath();
-    }
-
-    public static String getPackageResourcePath() {
-        return getPackageResourcePath(VContextHolder.instance().getContext());
     }
 
     public static String getPackageResourcePath(Context context) {
         return context.getPackageResourcePath();
     }
 
-
-    public static File getCacheDir() {
-        return getCacheDir(VContextHolder.instance().getContext());
-    }
-
     public static File getCacheDir(Context context) {
         return context.getCacheDir();
     }
 
-    public static File getFilesDir() {
-        return getFilesDir(VContextHolder.instance().getContext());
-    }
-
     public static File getFilesDir(Context context) {
         return context.getFilesDir();
-    }
-
-    public static File getDatabasePath(String name) {
-        return getDatabasePath(VContextHolder.instance().getContext(), name);
     }
 
     public static File getDatabasePath(Context context, String name) {
@@ -105,28 +81,16 @@ public final class VFilePath {
     public @interface FileMode {
     }
 
-    public static File getDir(String name, @FileMode int mode) {
-        return getDir(VContextHolder.instance().getContext(), name, mode);
-    }
-
     public static File getDir(Context context, String name, @FileMode int mode) {
         return context.getDir(name, mode);
-    }
-
-    public static File getExternalCacheDir() {
-        return getExternalCacheDir(VContextHolder.instance().getContext());
     }
 
     public static File getExternalCacheDir(Context context) {
         return context.getExternalCacheDir();
     }
 
-    public static File getExternalFilesDir() {
-        return getExternalFilesDir(VContextHolder.instance().getContext(), null);
-    }
-
-    public static File getExternalFilesDir(@Nullable String type) {
-        return getExternalFilesDir(VContextHolder.instance().getContext(), type);
+    public static File getExternalFilesDir(Context context) {
+        return getExternalFilesDir(context, null);
     }
 
     public static File getExternalFilesDir(Context context, @Nullable String type) {

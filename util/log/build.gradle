@@ -27,7 +27,4 @@ android {
 
 dependencies {
     implementation rootProject.ext.library.appcompat
-    implementation project(path: ':util:persist')
-    implementation project(path: ':util:context')
-    implementation project(path: ':util:thread')
 }

@@ -25,15 +25,13 @@ public abstract class VLocalServer extends VLocalWork {
         return null;
     }
 
-    protected abstract VLocalServerConnect createVServerConnect(int uid, int pid,
-                                                                LocalSocket localSocket,
-                                                                Looper acceptLooper,
-                                                                Looper sendLooper);
+    protected abstract VLocalServerConnect createVServerConnect(int uid, int pid, LocalSocket localSocket, Looper acceptLooper, Looper sendLooper);
 
     @Override
     protected void doWork() throws Throwable {
         mServerSocket = new LocalServerSocket(address());
         Log.d("VLocalServer", "doWork mServerSocket: " + mServerSocket);
+        linkSuccess(mServerSocket);
         while (isRunning()) {
             LocalSocket localSocket = mServerSocket.accept();
             Log.d("VLocalServer", "doWork localSocket: " + localSocket);
@@ -43,11 +41,14 @@ public abstract class VLocalServer extends VLocalWork {
                 int pid = credentials.getPid();
                 Log.d("VLocalServer", "doWork uid: " + uid + " pid: " + pid);
 
-                VLocalServerConnect connect = createVServerConnect(uid, pid, localSocket,
-                        acceptLooper(), sendLooper());
+                VLocalServerConnect connect = createVServerConnect(uid, pid, localSocket, acceptLooper(), sendLooper());
                 connect.start();
             }
         }
+    }
+
+    protected void linkSuccess(LocalServerSocket serverSocket) {
+
     }
 
     @Override

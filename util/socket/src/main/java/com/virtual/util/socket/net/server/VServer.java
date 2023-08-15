@@ -19,6 +19,7 @@ public abstract class VServer extends VWork {
 
     /**
      * A valid port value is between 0 and 65535
+     *
      * @return port
      */
     public abstract int port();
@@ -38,6 +39,7 @@ public abstract class VServer extends VWork {
     protected void doWork() throws Throwable {
         mServerSocket = new ServerSocket(port());
         Log.d("VServer", "doWork mServerSocket: " + mServerSocket);
+        linkSuccess(mServerSocket);
         while (isRunning()) {
             Socket socket = mServerSocket.accept();
             Log.d("VServer", "doWork socket: " + socket);
@@ -47,6 +49,10 @@ public abstract class VServer extends VWork {
                 connect.start();
             }
         }
+    }
+
+    protected void linkSuccess(ServerSocket serverSocket) {
+
     }
 
     @Override

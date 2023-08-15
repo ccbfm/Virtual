@@ -200,7 +200,7 @@ public class Launcher extends FragmentActivity {
         mAllAppsAnim = new AllAppsAnim(addAppsBtn, workspace, allApps);
         setContentView(content);
 
-        AppLoad.instance().load();
+        AppLoad.instance().load(this);
     }
 
     @Override

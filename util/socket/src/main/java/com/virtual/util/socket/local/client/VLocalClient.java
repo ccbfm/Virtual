@@ -73,7 +73,7 @@ public abstract class VLocalClient extends VLocalWork {
 
         mWriter = new PrintWriter(mClientSocket.getOutputStream());
         mReader = new BufferedReader(new InputStreamReader(mClientSocket.getInputStream()));
-
+        linkSuccess(mClientSocket);
         while (isRunning()) {
             String result = mReader.readLine();
             if (result == null) {
@@ -101,6 +101,10 @@ public abstract class VLocalClient extends VLocalWork {
                 mAcceptHandler.sendMessage(message);
             }
         }
+    }
+
+    protected void linkSuccess(LocalSocket socket) {
+
     }
 
     @Override

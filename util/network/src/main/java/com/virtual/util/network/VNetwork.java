@@ -1,5 +1,6 @@
 package com.virtual.util.network;
 
+import android.security.NetworkSecurityPolicy;
 import android.text.TextUtils;
 import android.util.Log;
 
@@ -130,7 +131,7 @@ public class VNetwork {
                 }
             }
         } catch (IOException ioe) {
-            Log.e("VNetwork", "get Exception ", ioe);
+            Log.e("VNetwork", "post Exception ", ioe);
         }
         return null;
     }

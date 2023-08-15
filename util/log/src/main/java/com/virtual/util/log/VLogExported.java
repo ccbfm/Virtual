@@ -7,13 +7,9 @@ import android.net.Uri;
 import android.os.DeadObjectException;
 import android.util.Log;
 
-import com.virtual.util.context.VContextHolder;
 import com.virtual.util.log.provider.VLogProvider;
-import com.virtual.util.thread.VThread;
-import com.virtual.util.thread.model.VSimpleTask;
 
 import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.TimeUnit;
 
 /**
  * 跨应用输出log记录在本应用目录中
@@ -83,6 +79,14 @@ public final class VLogExported {
         private final LinkedBlockingQueue<LogData> mLogDataQueue = new LinkedBlockingQueue<>();
         private LogTask mLogTask;
         private Uri mProviderUri;
+        private boolean mStop = false;
+
+        public void setStop(boolean stop) {
+            mStop = stop;
+            if (mLogTask != null) {
+                mLogTask.interrupt();
+            }
+        }
 
         public void init(Uri uri) {
             mProviderUri = uri;
@@ -99,7 +103,7 @@ public final class VLogExported {
             mLogDataQueue.offer(logData);
             if (mLogTask == null) {
                 mLogTask = new LogTask();
-                VThread.executeAtFixRate(VThread.getCachedPool(), mLogTask, 1, TimeUnit.MILLISECONDS);
+                mLogTask.start();
             } else {
                 synchronized (mLogDataQueue) {
                     mLogDataQueue.notify();
@@ -108,7 +112,11 @@ public final class VLogExported {
         }
 
         private void exportedProvider(@VLevel int level, String tag, String msg) {
-            Context context = VContextHolder.instance().getContext();
+            Context context = VLogConfig.instance().getContext();
+            if (context == null) {
+                Log.e("VLogExported", "exportedProvider context is null.");
+                return;
+            }
             Uri uri = checkProvider(context);
             try (ContentProviderClient client = context.getContentResolver()
                     .acquireUnstableContentProviderClient(uri)) {
@@ -125,27 +133,25 @@ public final class VLogExported {
             }
         }
 
-        public /*static*/ class LogTask extends VSimpleTask<Void> {
+        public /*static*/ class LogTask extends Thread {
             @Override
-            protected Void doTask() throws Throwable {
+            public void run() {
+                try {
+                    while (mStop) {
+                        synchronized (mLogDataQueue) {
+                            if (mLogDataQueue.size() == 0) {
+                                mLogDataQueue.wait();
+                            }
+                        }
 
-                synchronized (mLogDataQueue) {
-                    if (mLogDataQueue.size() == 0) {
-                        mLogDataQueue.wait();
+                        LogData logData = mLogDataQueue.poll();
+                        if (logData != null) {
+                            exportedProvider(logData.level, logData.tag, logData.msg);
+                        }
                     }
+                } catch (Throwable throwable) {
+                    Log.e("VLogExported", "LogTask run Throwable ", throwable);
                 }
-
-                LogData logData = mLogDataQueue.poll();
-                if (logData != null) {
-                    exportedProvider(logData.level, logData.tag, logData.msg);
-                }
-
-                return null;
-            }
-
-            @Override
-            protected void onSuccess(Void result) {
-
             }
         }
     }

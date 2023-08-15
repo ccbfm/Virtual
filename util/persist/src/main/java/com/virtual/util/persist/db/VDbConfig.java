@@ -1,8 +1,8 @@
 package com.virtual.util.persist.db;
 
+import android.content.Context;
 import android.text.TextUtils;
 
-import com.virtual.util.context.VContextHolder;
 import com.virtual.util.persist.db.dao.IVDao;
 import com.virtual.util.persist.db.dao.VDbPersistDao;
 
@@ -27,18 +27,18 @@ public class VDbConfig {
     private final HashMap<String, Builder> mDbMap = new HashMap<>();
 
 
-    public Builder getDb(String name) {
-        return getDb(name, "");
+    public Builder getDb(Context context, String name) {
+        return getDb(context, name, "");
     }
 
-    public Builder getDb(String name, String tableName) {
+    public Builder getDb(Context context, String name, String tableName) {
         Builder builder = mDbMap.get(name);
         if (builder == null) {
             if (DEFAULT_DB_NAME.equals(name)) {
                 if (TextUtils.isEmpty(tableName)) {
                     throw new NullPointerException("Db tableName is null.");
                 }
-                return createBuilder()
+                return createBuilder(context)
                         .setName(name)
                         .setVersion(1)
                         .addIVDao(new VDbPersistDao(tableName))
@@ -54,8 +54,8 @@ public class VDbConfig {
         mDbMap.put(builder.name, builder);
     }
 
-    public Builder createBuilder() {
-        return new Builder(this);
+    public Builder createBuilder(Context context) {
+        return new Builder(this, context);
     }
 
 
@@ -65,9 +65,11 @@ public class VDbConfig {
         private int version;
         private final Map<String, IVDao> daoMap = new HashMap<>();
         private VDbHelper dbHelper;
+        private final Context context;
 
-        Builder(VDbConfig dbConfig) {
+        Builder(VDbConfig dbConfig, Context context) {
             this.dbConfig = dbConfig;
+            this.context = context;
         }
 
         public String getName() {
@@ -102,7 +104,7 @@ public class VDbConfig {
         }
 
         public Builder build() {
-            this.dbHelper = new VDbHelper(VContextHolder.instance().getContext(),
+            this.dbHelper = new VDbHelper(this.context,
                     name, null, version, this.daoMap.values());
             this.dbHelper.getReadableDatabase();
             this.dbHelper.getWritableDatabase();

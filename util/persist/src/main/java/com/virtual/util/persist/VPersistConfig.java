@@ -1,5 +1,6 @@
 package com.virtual.util.persist;
 
+import android.content.Context;
 import android.text.TextUtils;
 
 import com.virtual.util.persist.file.VFilePath;
@@ -26,23 +27,25 @@ public class VPersistConfig {
         mBuilderMap.put(builder.persistName, builder);
     }
 
-    public Builder getBuilder() {
-        return getBuilder(DEFAULT_PERSIST);
+    public Builder getBuilder(Context context) {
+        return getBuilder(context, DEFAULT_PERSIST);
     }
 
-    public Builder getBuilder(String persistName) {
+    public Builder getBuilder(Context context, String persistName) {
         if (TextUtils.isEmpty(persistName)) {
             persistName = DEFAULT_PERSIST;
         }
         Builder builder = mBuilderMap.get(persistName);
         if (builder == null) {
-            builder = createBuilder().setPersistName(persistName).build();
+            builder = createBuilder(context)
+                    .setPersistName(persistName)
+                    .build();
         }
         return builder;
     }
 
-    public Builder createBuilder() {
-        return new Builder(this);
+    public Builder createBuilder(Context context) {
+        return new Builder(this, context);
     }
 
     public static final class Builder {
@@ -50,9 +53,11 @@ public class VPersistConfig {
         private String persistName;
         private int persistType = VPersistType.SP;
         private String persistDir;
+        private final Context context;
 
-        public Builder(VPersistConfig persistConfig) {
+        public Builder(VPersistConfig persistConfig, Context context) {
             this.persistConfig = persistConfig;
+            this.context = context;
         }
 
         public Builder setPersistName(String persistName) {
@@ -74,13 +79,17 @@ public class VPersistConfig {
             return this.persistName;
         }
 
+        public Context getContext() {
+            return context;
+        }
+
         public int getPersistType() {
             return this.persistType;
         }
 
         public String getPersistDir() {
             if (this.persistDir == null) {
-                this.persistDir = VFilePath.getExternalFilesDir(this.persistName).getAbsolutePath();
+                this.persistDir = VFilePath.getExternalFilesDir(this.context, this.persistName).getAbsolutePath();
             }
             return this.persistDir;
         }

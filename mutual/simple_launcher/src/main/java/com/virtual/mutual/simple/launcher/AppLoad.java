@@ -46,7 +46,7 @@ public class AppLoad {
         int LOADED = 2;
     }
 
-    public void load() {
+    public void load(Context context) {
         if (mLoadStatus != LoadStatus.NONE) {
             return;
         }
@@ -56,7 +56,7 @@ public class AppLoad {
         mWorkspaces.clear();
         mWorkspaceApps.clear();
 
-        Set<String> workspace_package_names = VSp.get(SP_NAME).getStringSet("workspace_package_names");
+        Set<String> workspace_package_names = VSp.get(context, SP_NAME).getStringSet("workspace_package_names");
         if (workspace_package_names != null) {
             for (String name : workspace_package_names) {
                 mWorkspaces.put(name, new App());
@@ -134,7 +134,7 @@ public class AppLoad {
         }
     }
 
-    public void addWorkspaceApp(App app) {
+    public void addWorkspaceApp(Context context, App app) {
         App wApp = new App(app);
         app.hasWorkplace = true;
         mWorkspaces.put(wApp.packageName, wApp);
@@ -142,10 +142,10 @@ public class AppLoad {
         if (mWorkspaceCallback != null) {
             mWorkspaceCallback.change(mWorkspaceApps);
         }
-        VSp.get(SP_NAME).putStringSet("workspace_package_names", mWorkspaces.keySet());
+        VSp.get(context, SP_NAME).putStringSet("workspace_package_names", mWorkspaces.keySet());
     }
 
-    public void removeWorkspaceApp(App app) {
+    public void removeWorkspaceApp(Context context, App app) {
         App wApp = mWorkspaces.remove(app.packageName);
         if (wApp != null) {
             app.hasWorkplace = false;
@@ -154,7 +154,7 @@ public class AppLoad {
         if (mWorkspaceCallback != null) {
             mWorkspaceCallback.change(mWorkspaceApps);
         }
-        VSp.get(SP_NAME).putStringSet("workspace_package_names", mWorkspaces.keySet());
+        VSp.get(context, SP_NAME).putStringSet("workspace_package_names", mWorkspaces.keySet());
     }
 
     public void searchApps(String keyword) {

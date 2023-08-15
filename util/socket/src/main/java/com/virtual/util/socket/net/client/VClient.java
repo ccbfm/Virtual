@@ -16,6 +16,7 @@ import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.InetSocketAddress;
+import java.net.ServerSocket;
 import java.net.Socket;
 
 public abstract class VClient extends VWork {
@@ -82,7 +83,7 @@ public abstract class VClient extends VWork {
 
         mWriter = new PrintWriter(mSocket.getOutputStream());
         mReader = new BufferedReader(new InputStreamReader(mSocket.getInputStream()));
-
+        linkSuccess(mSocket);
         while (isRunning()) {
             String result = mReader.readLine();
             if (result == null) {
@@ -110,6 +111,10 @@ public abstract class VClient extends VWork {
                 mAcceptHandler.sendMessage(message);
             }
         }
+    }
+
+    protected void linkSuccess(Socket socket) {
+
     }
 
     @Override

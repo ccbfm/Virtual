@@ -7,6 +7,7 @@ import android.os.Message;
 import android.text.TextUtils;
 import android.util.Log;
 
+import androidx.annotation.CallSuper;
 import androidx.annotation.NonNull;
 
 import com.virtual.util.socket.net.work.VWork;
@@ -129,6 +130,7 @@ public abstract class VServerConnect extends VWork {
         close();
     }
 
+    @CallSuper
     protected void recordConnect(String name, int userId) {
         VWorkPool.instance().recordConnect(name, userId, this);
     }
