@@ -1,5 +1,6 @@
 package com.virtual.util.network;
 
+import android.content.Context;
 import android.os.Handler;
 import android.os.Looper;
 import android.text.TextUtils;
@@ -56,6 +57,8 @@ public class VWebSocketManager {
         private WebSocket webSocket;
         private OkHttpClient client;
         private Request request;
+
+        private Context context;
         private final String url;
         private final WebSocketListener listener;
 
@@ -127,7 +130,10 @@ public class VWebSocketManager {
             }
         };
 
-        public Builder(@NonNull String url, @NonNull WebSocketListener listener) {
+        public Builder(@NonNull Context context,
+                       @NonNull String url,
+                       @NonNull WebSocketListener listener) {
+            this.context = context;
             this.url = url;
             this.listener = listener;
             this.wsHandler = new Handler(Looper.getMainLooper());
@@ -192,7 +198,7 @@ public class VWebSocketManager {
         private void setWsStatus(@WsStatus int wsStatus) {
             this.wsStatus = wsStatus;
             if (this.wsStatusListener != null) {
-                this.wsStatusListener.change(wsStatus);
+                this.wsStatusListener.change(wsStatus, stringWsStatus(wsStatus));
             }
         }
 
@@ -225,13 +231,18 @@ public class VWebSocketManager {
                     }
                 }
                 this.client = builder.build();
+            } else {
+                this.client.dispatcher().cancelAll();
             }
             if (this.request == null) {
                 this.request = new Request.Builder().get().url(url).build();
             }
-            setWsStatus(WsStatus.CONNECTING);
-            this.client.dispatcher().cancelAll();
-            this.webSocket = this.client.newWebSocket(this.request, this.webSocketListener);
+            if (VNetworkUtils.isNetworkConnected(this.context)) {
+                setWsStatus(WsStatus.CONNECTING);
+                this.webSocket = this.client.newWebSocket(this.request, this.webSocketListener);
+            } else {
+                retryConnect();
+            }
             return this;
         }
 
@@ -249,7 +260,9 @@ public class VWebSocketManager {
         }
 
         private void sendPing() {
-            send(this.pingString);
+            if (this.wsStatus == WsStatus.CONNECTED) {
+                send(this.pingString);
+            }
         }
 
         public void send(String jsonStr) {
@@ -285,7 +298,21 @@ public class VWebSocketManager {
         int RECONNECT = 3;
     }
 
+    private static String stringWsStatus(@WsStatus int status) {
+        switch (status) {
+            case WsStatus.DISCONNECTED:
+                return "未链接";
+            case WsStatus.CONNECTING:
+                return "链接中";
+            case WsStatus.CONNECTED:
+                return "已链接";
+            case WsStatus.RECONNECT:
+                return "重试中";
+        }
+        return "未知状态";
+    }
+
     public interface WsStatusListener {
-        void change(@WsStatus int status);
+        void change(@WsStatus int status, String statusStr);
     }
 }
