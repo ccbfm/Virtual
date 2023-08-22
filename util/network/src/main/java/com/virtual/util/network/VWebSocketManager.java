@@ -35,12 +35,13 @@ public class VWebSocketManager {
 
     private final HashMap<String, Builder> mWebSocketMap = new HashMap<>();
 
-    public void createWebSocket(@NonNull String key, @NonNull Builder builder) {
+    public void startWebSocket(@NonNull String key, @NonNull Builder builder) {
         Builder oldBuilder = mWebSocketMap.get(key);
         if (oldBuilder != null) {
             Log.w("VWebSocketManager", "createWebSocket key " + key + " is exist.");
             return;
         }
+        builder.build();
         mWebSocketMap.put(key, builder);
     }
 
@@ -58,7 +59,7 @@ public class VWebSocketManager {
         private OkHttpClient client;
         private Request request;
 
-        private Context context;
+        private final Context context;
         private final String url;
         private final WebSocketListener listener;
 
@@ -202,7 +203,7 @@ public class VWebSocketManager {
             }
         }
 
-        public Builder build() {
+        public void build() {
             if (this.client == null) {
                 OkHttpClient.Builder builder = new OkHttpClient.Builder();
                 //设置读取超时时间
@@ -243,7 +244,6 @@ public class VWebSocketManager {
             } else {
                 retryConnect();
             }
-            return this;
         }
 
         private void retryConnect() {
