@@ -1,6 +1,5 @@
 package com.virtual.util.network;
 
-import android.security.NetworkSecurityPolicy;
 import android.text.TextUtils;
 import android.util.Log;
 
@@ -8,6 +7,7 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
+import okhttp3.OkHttpClient;
 import okhttp3.ResponseBody;
 import retrofit2.Response;
 
@@ -27,7 +27,11 @@ public class VNetwork {
     }
 
     public static void init() {
-        VNetManager.instance().initDefault(null);
+        init(null);
+    }
+
+    public static void init(OkHttpClient client) {
+        VNetManager.instance().initDefault(client);
         VNetManager.instance().putApi(VApi.class);
     }
 

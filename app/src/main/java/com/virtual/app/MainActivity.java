@@ -1,24 +1,15 @@
 package com.virtual.app;
 
+import android.database.Cursor;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Process;
 import android.util.Log;
 import android.view.View;
 
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.virtual.util.log.VLog;
-import com.virtual.util.network.VNetwork;
-import com.virtual.util.network.VNetworkCallback;
-import com.virtual.util.socket.net.VNetSocket;
-import com.virtual.util.socket.net.client.VClient;
-
-import java.io.IOException;
-
-import okhttp3.ResponseBody;
-import retrofit2.Call;
-import retrofit2.Response;
 
 public class MainActivity extends AppCompatActivity {
 
