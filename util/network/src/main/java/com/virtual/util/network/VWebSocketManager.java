@@ -45,13 +45,13 @@ public class VWebSocketManager {
         mWebSocketMap.put(key, builder);
     }
 
-    public void sendMessage(@NonNull String url, String jsonStr) {
+    public boolean sendMessage(@NonNull String url, String jsonStr) {
         Builder builder = mWebSocketMap.get(url);
         if (builder == null) {
             Log.w("VWebSocketManager", "createWebSocket url " + url + " is not exist.");
-            return;
+            return false;
         }
-        builder.send(jsonStr);
+        return builder.send(jsonStr);
     }
 
     public static class Builder {
@@ -198,9 +198,26 @@ public class VWebSocketManager {
 
         private void setWsStatus(@WsStatus int wsStatus) {
             this.wsStatus = wsStatus;
+            if (wsStatus == WsStatus.CONNECTED) {
+                if (pingType() == 2) {
+                    if (this.pingScheduled == null) {
+                        this.pingScheduled = new ScheduledThreadPoolExecutor(1);
+                    }
+                    this.pingScheduled.scheduleAtFixedRate(new Runnable() {
+                        @Override
+                        public void run() {
+                            sendPing();
+                        }
+                    }, this.pingInterval, this.pingInterval, TimeUnit.SECONDS);
+                }
+            }
             if (this.wsStatusListener != null) {
                 this.wsStatusListener.change(wsStatus, stringWsStatus(wsStatus));
             }
+        }
+
+        private int pingType() {
+            return this.pingInterval > 0 ? TextUtils.isEmpty(this.pingString) ? 1 : 2 : 0;
         }
 
         public void build() {
@@ -218,23 +235,14 @@ public class VWebSocketManager {
                 if (this.connectTimeout > 0) {
                     builder.connectTimeout(this.connectTimeout, TimeUnit.SECONDS);
                 }
-                if (this.pingInterval > 0) {
-                    if (TextUtils.isEmpty(this.pingString)) {
-                        builder.pingInterval(this.pingInterval, TimeUnit.SECONDS);
-                    } else {
-                        this.pingScheduled = new ScheduledThreadPoolExecutor(1);
-                        this.pingScheduled.scheduleAtFixedRate(new Runnable() {
-                            @Override
-                            public void run() {
-                                sendPing();
-                            }
-                        }, this.pingInterval, this.pingInterval, TimeUnit.SECONDS);
-                    }
+                if (pingType() == 1) {
+                    builder.pingInterval(this.pingInterval, TimeUnit.SECONDS);
                 }
                 this.client = builder.build();
             } else {
                 this.client.dispatcher().cancelAll();
             }
+
             if (this.request == null) {
                 this.request = new Request.Builder().get().url(url).build();
             }
@@ -242,6 +250,7 @@ public class VWebSocketManager {
                 setWsStatus(WsStatus.CONNECTING);
                 this.webSocket = this.client.newWebSocket(this.request, this.webSocketListener);
             } else {
+                setWsStatus(WsStatus.DISCONNECTED);
                 retryConnect();
             }
         }
@@ -249,10 +258,11 @@ public class VWebSocketManager {
         private void retryConnect() {
             if (this.wsStatus == WsStatus.DISCONNECTED
                     && this.retryConnectTime > 0L) {
-                this.wsStatus = WsStatus.RECONNECT;
+                reset();
                 this.wsHandler.postDelayed(new Runnable() {
                     @Override
                     public void run() {
+                        setWsStatus(WsStatus.RECONNECT);
                         build();
                     }
                 }, this.retryConnectTime);
@@ -265,29 +275,43 @@ public class VWebSocketManager {
             }
         }
 
-        public void send(String jsonStr) {
+        public boolean send(String jsonStr) {
             if (this.webSocket != null) {
                 if (TextUtils.isEmpty(jsonStr)) {
                     Log.w("VWebSocketManager", "webSocket send is null.");
-                    return;
+                    return false;
                 }
-                this.webSocket.send(jsonStr);
+                Log.w("VWebSocketManager", "webSocket send jsonStr: " + jsonStr);
+                return this.webSocket.send(jsonStr);
             } else {
                 Log.w("VWebSocketManager", "webSocket is null.");
+            }
+            return false;
+        }
+
+        private void reset() {
+            Log.w("VWebSocketManager", "webSocket reset.");
+            try {
+                if (this.webSocket != null) {
+                    this.webSocket.cancel();
+                    this.webSocket.close(1000, "close");
+                }
+                this.webSocket = null;
+                if (this.pingScheduled != null) {
+                    this.pingScheduled.shutdownNow();
+                }
+                this.pingScheduled = null;
+                this.wsHandler.removeCallbacksAndMessages(null);
+            } catch (Throwable throwable) {
+                Log.e("VWebSocketManager", "webSocket reset Throwable.", throwable);
             }
         }
 
         public void close() {
             Log.w("VWebSocketManager", "webSocket close.");
-            if (this.webSocket != null) {
-                this.webSocket.cancel();
-                this.webSocket.close(0, "close");
-            }
-            if (this.pingScheduled != null) {
-                this.pingScheduled.shutdownNow();
-            }
+            this.pingInterval = 0L;
             this.retryConnectTime = 0L;
-            this.wsHandler.removeCallbacksAndMessages(null);
+            reset();
         }
     }
 
