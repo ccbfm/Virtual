@@ -84,6 +84,7 @@ dependencies {
     implementation rootProject.ext.library.retrofit_converter_gson
     implementation rootProject.ext.library.okhttp_interceptor
     implementation project(path: ':generic:zxing')
+    implementation project(path: ':generic:location')
 }
 
 tasks.whenTaskAdded {task ->

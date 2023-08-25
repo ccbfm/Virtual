@@ -99,12 +99,13 @@ public final class CaptureActivity extends Activity {
         mZXingView.onDestroy(); // 销毁二维码扫描控件
     }
 
-    public static void start(Activity activity, String result_key, int request_code) {
+    public static void start(Activity activity, String result_key,
+                             int request_code, int permission_request_code) {
         if (ActivityCompat.checkSelfPermission(activity, android.Manifest.permission.CAMERA)
                 != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(activity, new String[]{
                     android.Manifest.permission.CAMERA,
-            }, 0x11);
+            }, permission_request_code);
             return;
         }
         Intent intent = new Intent(activity, CaptureActivity.class);
