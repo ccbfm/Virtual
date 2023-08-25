@@ -7,6 +7,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.VibrationEffect;
 import android.os.Vibrator;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.WindowManager;
 
@@ -19,22 +20,30 @@ import cn.bingoogolapple.qrcode.zxing.ZXingView;
 public final class CaptureActivity extends Activity {
     private static final String TAG = "CaptureActivity";
     private ZXingView mZXingView;
+    private String mResultKey;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         setContentView(R.layout.layout_capture);
+        Intent intent = getIntent();
+        if (intent != null) {
+            mResultKey = intent.getStringExtra("result_key");
+        }
+        if (TextUtils.isEmpty(mResultKey)) {
+            mResultKey = "scan_result";
+        }
 
         mZXingView = findViewById(R.id.zxing_scan_view);
         mZXingView.setDelegate(new QRCodeView.Delegate() {
             @Override
             public void onScanQRCodeSuccess(String result) {
-                Log.d(TAG, "onScanQRCodeSuccess: " + result);
+                Log.d(TAG, "onScanQRCodeSuccess ResultKey: " + mResultKey);
                 vibrate();
 
                 Intent intent = new Intent();
-                intent.putExtra("scan_result", result);
+                intent.putExtra(mResultKey, result);
                 setResult(RESULT_OK, intent);
                 CaptureActivity.this.finish();
             }
@@ -90,7 +99,7 @@ public final class CaptureActivity extends Activity {
         mZXingView.onDestroy(); // 销毁二维码扫描控件
     }
 
-    public static void start(Activity activity) {
+    public static void start(Activity activity, String result_key, int request_code) {
         if (ActivityCompat.checkSelfPermission(activity, android.Manifest.permission.CAMERA)
                 != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(activity, new String[]{
@@ -99,6 +108,9 @@ public final class CaptureActivity extends Activity {
             return;
         }
         Intent intent = new Intent(activity, CaptureActivity.class);
-        activity.startActivity(intent);
+        intent.putExtra("result_key", result_key);
+        activity.startActivityForResult(intent, request_code);
     }
+
+
 }

@@ -1,10 +1,12 @@
 package com.virtual.app;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.Process;
 import android.util.Log;
 import android.view.View;
 
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.virtual.generic.zxing.CaptureActivity;
@@ -23,7 +25,7 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View v) {
                 Log.d("Virtual", "app onClick " + v);
 
-                CaptureActivity.start(MainActivity.this);
+                CaptureActivity.start(MainActivity.this, "xxxxxx", 1);
 
                 /*Intent mIntent = new Intent(Settings.ACTION_HOME_SETTINGS);
                 startActivity(mIntent);*/
@@ -39,4 +41,15 @@ public class MainActivity extends AppCompatActivity {
         VLog.i("app", "MainActivity-onCreate " + Process.myUid() + " " + Process.myUserHandle().toString());
     }
 
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        VLog.i("app", "MainActivity-onActivityResult " + requestCode + " " + resultCode + " " + data);
+        if(data != null){
+            Bundle bundle = data.getExtras();
+            for (String key : bundle.keySet()) {
+                VLog.i("app", "MainActivity-onActivityResult " + key + " " + bundle.get(key));
+            }
+        }
+    }
 }

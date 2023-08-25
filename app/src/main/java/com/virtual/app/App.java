@@ -14,7 +14,8 @@ public class App extends Application {
         Log.d("App", "onCreate");
         VLogConfig.instance().createBuilder(this)
                 .setLogTag("Virtual")
-                .setDebugLevel(BuildConfig.DEBUG ? VLevel.D : VLevel.NONE)
+                //.setDebugLevel(BuildConfig.DEBUG ? VLevel.D : VLevel.NONE)
+                .setDebugLevel(VLevel.D)
                 .setSaveLevel(VLevel.W)
                 .build();
     }
