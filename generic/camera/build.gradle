@@ -3,7 +3,7 @@ plugins {
 }
 
 android {
-    namespace 'com.virtual.generic.zxing'
+    namespace 'com.virtual.generic.camera'
     compileSdk rootProject.ext.android.compileSdk
 
     defaultConfig {
@@ -29,27 +29,4 @@ dependencies {
 
     implementation rootProject.ext.library.appcompat
     implementation rootProject.ext.library.material
-    implementation files('libs/zxing-core-3.5.2.jar')
-    //implementation 'com.github.bingoogolapple.BGAQRCode-Android:zxing:1.3.8'
 }
-
-apply plugin: 'maven-publish'
-afterEvaluate {
-    publishing {
-        publications {
-            maven(MavenPublication) {
-                from components.release
-                groupId = 'zxing'
-                artifactId = 'zxing-release'
-                version = '1.0.0'
-            }
-        }
-
-        repositories {
-            maven {
-                url = "${rootDir}${File.separator}1Repository${File.separator}"
-            }
-        }
-    }
-}
-

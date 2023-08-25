@@ -1,7 +1,5 @@
 package com.virtual.app;
 
-import android.database.Cursor;
-import android.net.Uri;
 import android.os.Bundle;
 import android.os.Process;
 import android.util.Log;
@@ -9,6 +7,7 @@ import android.view.View;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.virtual.generic.zxing.CaptureActivity;
 import com.virtual.util.log.VLog;
 
 public class MainActivity extends AppCompatActivity {
@@ -23,8 +22,8 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 Log.d("Virtual", "app onClick " + v);
-                /*Intent intent = new Intent(MainActivity.this, Launcher.class);
-                MainActivity.this.startActivity(intent);*/
+
+                CaptureActivity.start(MainActivity.this);
 
                 /*Intent mIntent = new Intent(Settings.ACTION_HOME_SETTINGS);
                 startActivity(mIntent);*/
