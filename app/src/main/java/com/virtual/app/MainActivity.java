@@ -30,7 +30,7 @@ public class MainActivity extends AppCompatActivity {
                 Log.d("Virtual", "app onClick " + v);
 
                 //LocationWebActivity.start(MainActivity.this, "xxxxxx", 1);
-                CaptureActivity.start(MainActivity.this, "xxxxx", 1, 0x11);
+                CaptureActivity.start(MainActivity.this, 1, 0x11);
 
                 /*Intent mIntent = new Intent(Settings.ACTION_HOME_SETTINGS);
                 startActivity(mIntent);*/

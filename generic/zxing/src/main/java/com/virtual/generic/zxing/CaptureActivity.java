@@ -20,30 +20,23 @@ import cn.bingoogolapple.qrcode.zxing.ZXingView;
 public final class CaptureActivity extends Activity {
     private static final String TAG = "CaptureActivity";
     private ZXingView mZXingView;
-    private String mResultKey;
+    private boolean mIsDark = false;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         setContentView(R.layout.layout_capture);
-        Intent intent = getIntent();
-        if (intent != null) {
-            mResultKey = intent.getStringExtra("result_key");
-        }
-        if (TextUtils.isEmpty(mResultKey)) {
-            mResultKey = "scan_result";
-        }
 
         mZXingView = findViewById(R.id.zxing_scan_view);
         mZXingView.setDelegate(new QRCodeView.Delegate() {
             @Override
             public void onScanQRCodeSuccess(String result) {
-                Log.d(TAG, "onScanQRCodeSuccess ResultKey: " + mResultKey);
+                Log.d(TAG, "onScanQRCodeSuccess isEmpty " + TextUtils.isEmpty(result));
                 vibrate();
 
                 Intent intent = new Intent();
-                intent.putExtra(mResultKey, result);
+                intent.putExtra("scan_result", result);
                 setResult(RESULT_OK, intent);
                 CaptureActivity.this.finish();
             }
@@ -51,10 +44,13 @@ public final class CaptureActivity extends Activity {
             @Override
             public void onCameraAmbientBrightnessChanged(boolean isDark) {
                 Log.d(TAG, "onCameraAmbientBrightnessChanged: " + isDark);
-                if (isDark) {
-                    mZXingView.getScanBoxView().setTipText(getString(R.string.scan_dark_hints));
-                } else {
-                    mZXingView.getScanBoxView().setTipText(getString(R.string.scan_normal_hints));
+                if (mIsDark != isDark) {
+                    if (isDark) {
+                        mZXingView.getScanBoxView().setTipText(getString(R.string.scan_dark_hints));
+                    } else {
+                        mZXingView.getScanBoxView().setTipText(getString(R.string.scan_normal_hints));
+                    }
+                    mIsDark = isDark;
                 }
             }
 
@@ -99,8 +95,10 @@ public final class CaptureActivity extends Activity {
         mZXingView.onDestroy(); // 销毁二维码扫描控件
     }
 
-    public static void start(Activity activity, String result_key,
-                             int request_code, int permission_request_code) {
+    /**
+     * 扫码返回结果字段 scan_result
+     */
+    public static void start(Activity activity, int request_code, int permission_request_code) {
         if (ActivityCompat.checkSelfPermission(activity, android.Manifest.permission.CAMERA)
                 != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(activity, new String[]{
@@ -109,7 +107,6 @@ public final class CaptureActivity extends Activity {
             return;
         }
         Intent intent = new Intent(activity, CaptureActivity.class);
-        intent.putExtra("result_key", result_key);
         activity.startActivityForResult(intent, request_code);
     }
 

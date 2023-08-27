@@ -22,19 +22,10 @@ import java.net.URLDecoder;
 
 public class LocationWebActivity extends Activity {
     private static final String TAG = "LocationWebActivity";
-    private String mResultKey;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        Intent intent = getIntent();
-        if (intent != null) {
-            mResultKey = intent.getStringExtra("result_key");
-        }
-        if (TextUtils.isEmpty(mResultKey)) {
-            mResultKey = "scan_result";
-        }
 
         setContentView(initView(this));
     }
@@ -63,7 +54,7 @@ public class LocationWebActivity extends Activity {
                                 Log.d(TAG, "shouldOverrideUrlLoading-latng=" + latng);
                                 if (!TextUtils.isEmpty(latng)) {
                                     Intent resultIntent = new Intent();
-                                    resultIntent.putExtra(mResultKey, latng);
+                                    resultIntent.putExtra("location_result", latng);
                                     setResult(RESULT_OK, resultIntent);
                                     LocationWebActivity.this.finish();
                                     return true;
@@ -84,9 +75,11 @@ public class LocationWebActivity extends Activity {
         return content;
     }
 
-    public static void start(Activity activity, String result_key, int request_code) {
+    /**
+     * 返回结果字段 location_result
+     */
+    public static void start(Activity activity, int request_code) {
         Intent intent = new Intent(activity, LocationWebActivity.class);
-        intent.putExtra("result_key", result_key);
         activity.startActivityForResult(intent, request_code);
     }
 }
