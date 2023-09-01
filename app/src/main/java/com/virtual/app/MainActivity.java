@@ -11,8 +11,8 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 
-import com.virtual.generic.zxing.CaptureActivity;
 import com.virtual.util.log.VLog;
+import com.virtual.util.network.VDownloadManager;
 
 import java.util.Arrays;
 
@@ -28,9 +28,41 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 Log.d("Virtual", "app onClick " + v);
+                String path = getExternalFilesDir("apk") + "/app-yunguanjia-release.apk";
+                if (VDownloadManager.instance().isDownload(path)) {
+                    VDownloadManager.instance().stopDownload(path);
+                } else {
+                    VDownloadManager.instance().startDownload(path,
+                            "https://img.qn.72ygj.com/72ygj/app-yunguanjia-release.apk",
+                            true, new VDownloadManager.DownloadStatusAdapter() {
+                                @Override
+                                public void start(String path) {
+                                    super.start(path);
+                                    Log.d("Virtual", "VDownloadManager start " + path);
+                                }
+
+                                @Override
+                                public void progress(String path, long curLen, long allLen) {
+                                    super.progress(path, curLen, allLen);
+                                    Log.d("Virtual", "VDownloadManager progress " + path + " " + curLen + " " + allLen);
+                                }
+
+                                @Override
+                                public void end(boolean complete, String path) {
+                                    super.end(complete, path);
+                                    Log.d("Virtual", "VDownloadManager end " + path + " " + complete);
+                                }
+
+                                @Override
+                                public void error(String path, String error) {
+                                    super.error(path, error);
+                                    Log.d("Virtual", "VDownloadManager error " + path + " " + error);
+                                }
+                            });
+                }
 
                 //LocationWebActivity.start(MainActivity.this, "xxxxxx", 1);
-                CaptureActivity.start(MainActivity.this, 1, 0x11);
+                //CaptureActivity.start(MainActivity.this, 1, 0x11);
 
                 /*Intent mIntent = new Intent(Settings.ACTION_HOME_SETTINGS);
                 startActivity(mIntent);*/
