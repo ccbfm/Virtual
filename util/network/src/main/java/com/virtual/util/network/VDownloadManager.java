@@ -31,6 +31,14 @@ public class VDownloadManager {
 
     private final HashMap<String, DownloadTask> mDownloadTaskMap = new HashMap<>();
 
+    /**
+     * 下载
+     *
+     * @param path           下载文件全路径
+     * @param url            下载地址
+     * @param breakpoint     是否断点下载
+     * @param downloadStatus 下载状态回调
+     */
     public void startDownload(@NonNull String path,
                               @NonNull String url,
                               boolean breakpoint,
@@ -57,10 +65,21 @@ public class VDownloadManager {
         downloadTask.start();
     }
 
+    /**
+     * 下载状态
+     *
+     * @param path 下载文件全路径
+     * @return 是否下载中
+     */
     public boolean isDownload(@NonNull String path) {
         return mDownloadTaskMap.get(path) != null;
     }
 
+    /**
+     * 停止下载
+     *
+     * @param path 下载文件全路径
+     */
     public void stopDownload(@NonNull String path) {
         DownloadTask downloadTask = mDownloadTaskMap.remove(path);
         if (downloadTask == null) {
