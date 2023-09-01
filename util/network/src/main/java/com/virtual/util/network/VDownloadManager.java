@@ -78,7 +78,7 @@ public class VDownloadManager {
         private final boolean breakpoint;
         private final DownloadStatusAdapter downloadStatus, endStatus;
         private final Handler mainHandler;
-        private boolean isDownload = false;
+        private boolean isDownload;
 
         public DownloadTask(@NonNull String path,
                             @NonNull String url,

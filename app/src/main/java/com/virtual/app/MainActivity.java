@@ -28,38 +28,8 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 Log.d("Virtual", "app onClick " + v);
-                String path = getExternalFilesDir("apk") + "/app-yunguanjia-release.apk";
-                if (VDownloadManager.instance().isDownload(path)) {
-                    VDownloadManager.instance().stopDownload(path);
-                } else {
-                    VDownloadManager.instance().startDownload(path,
-                            "https://img.qn.72ygj.com/72ygj/app-yunguanjia-release.apk",
-                            true, new VDownloadManager.DownloadStatusAdapter() {
-                                @Override
-                                public void start(String path) {
-                                    super.start(path);
-                                    Log.d("Virtual", "VDownloadManager start " + path);
-                                }
 
-                                @Override
-                                public void progress(String path, long curLen, long allLen) {
-                                    super.progress(path, curLen, allLen);
-                                    Log.d("Virtual", "VDownloadManager progress " + path + " " + curLen + " " + allLen);
-                                }
-
-                                @Override
-                                public void end(boolean complete, String path) {
-                                    super.end(complete, path);
-                                    Log.d("Virtual", "VDownloadManager end " + path + " " + complete);
-                                }
-
-                                @Override
-                                public void error(String path, String error) {
-                                    super.error(path, error);
-                                    Log.d("Virtual", "VDownloadManager error " + path + " " + error);
-                                }
-                            });
-                }
+                testDownload();
 
                 //LocationWebActivity.start(MainActivity.this, "xxxxxx", 1);
                 //CaptureActivity.start(MainActivity.this, 1, 0x11);
@@ -78,6 +48,40 @@ public class MainActivity extends AppCompatActivity {
         VLog.i("app", "MainActivity-onCreate " + Process.myUid() + " " + Process.myUserHandle().toString());
     }
 
+    private void testDownload(){
+        String path = getExternalFilesDir("apk") + "/app-yunguanjia-release.apk";
+        if (VDownloadManager.instance().isDownload(path)) {
+            VDownloadManager.instance().stopDownload(path);
+        } else {
+            VDownloadManager.instance().startDownload(path,
+                    "https://img.qn.72ygj.com/72ygj/app-yunguanjia-release.apk",
+                    true, new VDownloadManager.DownloadStatusAdapter() {
+                        @Override
+                        public void start(String path) {
+                            super.start(path);
+                            Log.d("Virtual", "VDownloadManager start " + path);
+                        }
+
+                        @Override
+                        public void progress(String path, long curLen, long allLen) {
+                            super.progress(path, curLen, allLen);
+                            Log.d("Virtual", "VDownloadManager progress " + path + " " + curLen + " " + allLen);
+                        }
+
+                        @Override
+                        public void end(boolean complete, String path) {
+                            super.end(complete, path);
+                            Log.d("Virtual", "VDownloadManager end " + path + " " + complete);
+                        }
+
+                        @Override
+                        public void error(String path, String error) {
+                            super.error(path, error);
+                            Log.d("Virtual", "VDownloadManager error " + path + " " + error);
+                        }
+                    });
+        }
+    }
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
