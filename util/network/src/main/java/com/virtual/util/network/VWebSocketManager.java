@@ -281,7 +281,7 @@ public class VWebSocketManager {
                     Log.w("VWebSocketManager", "webSocket send is null.");
                     return false;
                 }
-                Log.w("VWebSocketManager", "webSocket send jsonStr: " + jsonStr);
+                //Log.w("VWebSocketManager", "webSocket send jsonStr: " + jsonStr);
                 return this.webSocket.send(jsonStr);
             } else {
                 Log.w("VWebSocketManager", "webSocket is null.");

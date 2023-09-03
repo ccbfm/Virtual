@@ -78,6 +78,10 @@ public final class VLogConfig {
         mILogs.addAll(iLogs);
     }
 
+    private void clearILogs() {
+        mILogs.clear();
+    }
+
     private void setContext(Context context) {
         mContext = context.getApplicationContext();
     }
@@ -170,6 +174,7 @@ public final class VLogConfig {
         }
 
         public void build() {
+            this.logConfig.clearILogs();
             this.logConfig.setLogTag(this.logTag);
             if (this.debugLevel < VLogLevel.NONE) {
                 this.logConfig.setDebugLevel(this.debugLevel);
