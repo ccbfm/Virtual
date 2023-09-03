@@ -10,7 +10,6 @@ import com.virtual.util.log.flavor.VPrintLog;
 import com.virtual.util.log.flavor.VSaveLog;
 
 import java.io.File;
-import java.lang.ref.WeakReference;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -32,6 +31,14 @@ public final class VLogConfig {
                 .setLogTag(tag)
                 .setDebugLevel(debug ? VLevel.D : VLevel.NONE)
                 .setSaveLevel(VLevel.W)
+                .build();
+    }
+
+    public void defaultNotSaveConfig(@NonNull Context context, String tag, boolean debug) {
+        createBuilder(context)
+                .setLogTag(tag)
+                .setDebugLevel(debug ? VLevel.D : VLevel.NONE)
+                .setSaveLevel(VLevel.NONE)
                 .build();
     }
 
@@ -111,7 +118,7 @@ public final class VLogConfig {
         private final VLogConfig logConfig;
         private final Context context;
 
-        public Builder(VLogConfig logConfig, Context context) {
+        public Builder(VLogConfig logConfig, @NonNull Context context) {
             this.logConfig = logConfig;
             this.context = context;
         }
@@ -176,7 +183,7 @@ public final class VLogConfig {
                 this.logConfig.setSaveLevel(this.saveLevel);
 
                 String saveRootDir = this.saveRootDir;
-                if (TextUtils.isEmpty(saveRootDir) && this.context != null) {
+                if (TextUtils.isEmpty(saveRootDir)) {
                     saveRootDir = this.context.getExternalFilesDir("Log_" + this.logTag).getAbsolutePath();
                 }
                 if (TextUtils.isEmpty(saveRootDir)) {
