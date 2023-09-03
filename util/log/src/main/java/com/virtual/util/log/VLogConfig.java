@@ -29,24 +29,24 @@ public final class VLogConfig {
     public void defaultConfig(@NonNull Context context, String tag, boolean debug) {
         createBuilder(context)
                 .setLogTag(tag)
-                .setDebugLevel(debug ? VLevel.D : VLevel.NONE)
-                .setSaveLevel(VLevel.W)
+                .setDebugLevel(debug ? VLogLevel.D : VLogLevel.NONE)
+                .setSaveLevel(VLogLevel.W)
                 .build();
     }
 
     public void defaultNotSaveConfig(@NonNull Context context, String tag, boolean debug) {
         createBuilder(context)
                 .setLogTag(tag)
-                .setDebugLevel(debug ? VLevel.D : VLevel.NONE)
-                .setSaveLevel(VLevel.NONE)
+                .setDebugLevel(debug ? VLogLevel.D : VLogLevel.NONE)
+                .setSaveLevel(VLogLevel.NONE)
                 .build();
     }
 
     private String mLogTag = "Default";
-    @VLevel
-    private int mDebugLevel = VLevel.NONE;
-    @VLevel
-    private int mSaveLevel = VLevel.NONE;
+    @VLogLevel
+    private int mDebugLevel = VLogLevel.NONE;
+    @VLogLevel
+    private int mSaveLevel = VLogLevel.NONE;
 
     private String mSaveRootDir;
 
@@ -124,11 +124,11 @@ public final class VLogConfig {
         }
 
         private String logTag = "Default";
-        @VLevel
-        private int debugLevel = VLevel.NONE;
+        @VLogLevel
+        private int debugLevel = VLogLevel.NONE;
         private IVLog debugLog;
-        @VLevel
-        private int saveLevel = VLevel.NONE;
+        @VLogLevel
+        private int saveLevel = VLogLevel.NONE;
         private IVLog saveLog;
         private String saveRootDir;
 
@@ -139,7 +139,7 @@ public final class VLogConfig {
             return this;
         }
 
-        public Builder setDebugLevel(@VLevel int debugLevel) {
+        public Builder setDebugLevel(@VLogLevel int debugLevel) {
             this.debugLevel = debugLevel;
             return this;
         }
@@ -149,7 +149,7 @@ public final class VLogConfig {
             return this;
         }
 
-        public Builder setSaveLevel(@VLevel int saveLevel) {
+        public Builder setSaveLevel(@VLogLevel int saveLevel) {
             this.saveLevel = saveLevel;
             return this;
         }
@@ -171,7 +171,7 @@ public final class VLogConfig {
 
         public void build() {
             this.logConfig.setLogTag(this.logTag);
-            if (this.debugLevel < VLevel.NONE) {
+            if (this.debugLevel < VLogLevel.NONE) {
                 this.logConfig.setDebugLevel(this.debugLevel);
                 IVLog debugLog = this.debugLog;
                 if (debugLog == null) {
@@ -179,7 +179,7 @@ public final class VLogConfig {
                 }
                 this.logConfig.addILog(debugLog);
             }
-            if (this.saveLevel < VLevel.NONE) {
+            if (this.saveLevel < VLogLevel.NONE) {
                 this.logConfig.setSaveLevel(this.saveLevel);
 
                 String saveRootDir = this.saveRootDir;

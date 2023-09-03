@@ -2,17 +2,17 @@ package com.virtual.util.log;
 
 public final class VLevelString {
 
-    public static String levelString(@VLevel int level) {
+    public static String levelString(@VLogLevel int level) {
         switch (level) {
-            case VLevel.D:
+            case VLogLevel.D:
                 return "D";
-            case VLevel.I:
+            case VLogLevel.I:
                 return "I";
-            case VLevel.W:
+            case VLogLevel.W:
                 return "W";
-            case VLevel.E:
+            case VLogLevel.E:
                 return "E";
-            case VLevel.NONE:
+            case VLogLevel.NONE:
                 break;
         }
         return level + "";

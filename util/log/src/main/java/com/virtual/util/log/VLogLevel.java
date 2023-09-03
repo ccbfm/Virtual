@@ -6,14 +6,14 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 
 @IntDef({
-        VLevel.D,
-        VLevel.I,
-        VLevel.W,
-        VLevel.E,
-        VLevel.NONE
+        VLogLevel.D,
+        VLogLevel.I,
+        VLogLevel.W,
+        VLogLevel.E,
+        VLogLevel.NONE
 })
 @Retention(RetentionPolicy.SOURCE)
-public @interface VLevel {
+public @interface VLogLevel {
 
     int D = 1;
 

@@ -2,7 +2,7 @@ package com.virtual.util.log.flavor;
 
 import android.util.Log;
 
-import com.virtual.util.log.VLevel;
+import com.virtual.util.log.VLogLevel;
 import com.virtual.util.log.VLevelString;
 import com.virtual.util.log.VLogConfig;
 
@@ -14,7 +14,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 public class VSaveLog extends VBaseLog {
-    @VLevel
+    @VLogLevel
     protected final int mSaveLevel;
     protected final String mSaveRootDir;
     protected final ExecutorService mExecutor;
@@ -76,7 +76,7 @@ public class VSaveLog extends VBaseLog {
         return file != null && (file.exists() ? file.isDirectory() : file.mkdirs());
     }
 
-    protected boolean checkSave(@VLevel int saveLevel) {
+    protected boolean checkSave(@VLogLevel int saveLevel) {
         return mSaveLevel <= saveLevel;
     }
 
@@ -85,7 +85,7 @@ public class VSaveLog extends VBaseLog {
         return "[" + getCurrentTime() + "] " + super.formatLog(level, tag, msg) + "\n";
     }
 
-    protected void saveLogToFile(@VLevel int level, String tag, String msg) {
+    protected void saveLogToFile(@VLogLevel int level, String tag, String msg) {
         String levelStr = VLevelString.levelString(level);
         mExecutor.execute(new SaveTask(this, levelStr, tag, msg));
     }
@@ -144,36 +144,36 @@ public class VSaveLog extends VBaseLog {
 
     @Override
     public void d(String tag, String msg) {
-        if (checkSave(VLevel.D)) {
-            saveLogToFile(VLevel.D, tag, msg);
+        if (checkSave(VLogLevel.D)) {
+            saveLogToFile(VLogLevel.D, tag, msg);
         }
     }
 
     @Override
     public void i(String tag, String msg) {
-        if (checkSave(VLevel.I)) {
-            saveLogToFile(VLevel.I, tag, msg);
+        if (checkSave(VLogLevel.I)) {
+            saveLogToFile(VLogLevel.I, tag, msg);
         }
     }
 
     @Override
     public void w(String tag, String msg) {
-        if (checkSave(VLevel.W)) {
-            saveLogToFile(VLevel.W, tag, msg);
+        if (checkSave(VLogLevel.W)) {
+            saveLogToFile(VLogLevel.W, tag, msg);
         }
     }
 
     @Override
     public void e(String tag, String msg) {
-        if (checkSave(VLevel.E)) {
-            saveLogToFile(VLevel.E, tag, msg);
+        if (checkSave(VLogLevel.E)) {
+            saveLogToFile(VLogLevel.E, tag, msg);
         }
     }
 
     @Override
     public void e(String tag, String msg, Throwable tr) {
-        if (checkSave(VLevel.E)) {
-            saveLogToFile(VLevel.E, tag, msg + " Throwable: " + Log.getStackTraceString(tr));
+        if (checkSave(VLogLevel.E)) {
+            saveLogToFile(VLogLevel.E, tag, msg + " Throwable: " + Log.getStackTraceString(tr));
         }
     }
 }

@@ -26,23 +26,23 @@ public final class VLogExported {
     }
 
     public static void d(String tag, String msg) {
-        Manager.instance().offer(new LogData(VLevel.D, tag, msg));
+        Manager.instance().offer(new LogData(VLogLevel.D, tag, msg));
     }
 
     public static void i(String tag, String msg) {
-        Manager.instance().offer(new LogData(VLevel.I, tag, msg));
+        Manager.instance().offer(new LogData(VLogLevel.I, tag, msg));
     }
 
     public static void w(String tag, String msg) {
-        Manager.instance().offer(new LogData(VLevel.W, tag, msg));
+        Manager.instance().offer(new LogData(VLogLevel.W, tag, msg));
     }
 
     public static void e(String tag, String msg) {
-        Manager.instance().offer(new LogData(VLevel.E, tag, msg));
+        Manager.instance().offer(new LogData(VLogLevel.E, tag, msg));
     }
 
     public static void e(String tag, String msg, Throwable tr) {
-        Manager.instance().offer(new LogData(VLevel.E, tag, msg + " Throwable: " + Log.getStackTraceString(tr)));
+        Manager.instance().offer(new LogData(VLogLevel.E, tag, msg + " Throwable: " + Log.getStackTraceString(tr)));
     }
 
 
@@ -52,12 +52,12 @@ public final class VLogExported {
     }
 
     private static class LogData {
-        @VLevel
+        @VLogLevel
         private final int level;
         private final String tag;
         private final String msg;
 
-        public LogData(@VLevel int level, String tag, String msg) {
+        public LogData(@VLogLevel int level, String tag, String msg) {
             this.level = level;
             this.tag = tag;
             this.msg = msg;
@@ -111,7 +111,7 @@ public final class VLogExported {
             }
         }
 
-        private void exportedProvider(@VLevel int level, String tag, String msg) {
+        private void exportedProvider(@VLogLevel int level, String tag, String msg) {
             Context context = VLogConfig.instance().getContext();
             if (context == null) {
                 Log.e("VLogExported", "exportedProvider context is null.");

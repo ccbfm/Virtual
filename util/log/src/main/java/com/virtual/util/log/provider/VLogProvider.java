@@ -9,7 +9,7 @@ import android.util.Log;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
-import com.virtual.util.log.VLevel;
+import com.virtual.util.log.VLogLevel;
 import com.virtual.util.log.VLog;
 
 import java.lang.annotation.Retention;
@@ -58,16 +58,16 @@ public final class VLogProvider extends ContentProvider {
 
                 if (level != null) {
                     switch (level) {
-                        case VLevel.D:
+                        case VLogLevel.D:
                             VLog.d(tag, message);
                             break;
-                        case VLevel.I:
+                        case VLogLevel.I:
                             VLog.i(tag, message);
                             break;
-                        case VLevel.W:
+                        case VLogLevel.W:
                             VLog.w(tag, message);
                             break;
-                        case VLevel.E:
+                        case VLogLevel.E:
                             VLog.e(tag, message);
                             break;
                     }

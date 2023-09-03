@@ -3,7 +3,7 @@ package com.virtual.app;
 import android.app.Application;
 import android.util.Log;
 
-import com.virtual.util.log.VLevel;
+import com.virtual.util.log.VLogLevel;
 import com.virtual.util.log.VLogConfig;
 
 public class App extends Application {
@@ -15,8 +15,8 @@ public class App extends Application {
         VLogConfig.instance().createBuilder(this)
                 .setLogTag("Virtual")
                 //.setDebugLevel(BuildConfig.DEBUG ? VLevel.D : VLevel.NONE)
-                .setDebugLevel(VLevel.D)
-                .setSaveLevel(VLevel.W)
+                .setDebugLevel(VLogLevel.D)
+                .setSaveLevel(VLogLevel.W)
                 .build();
     }
 }
