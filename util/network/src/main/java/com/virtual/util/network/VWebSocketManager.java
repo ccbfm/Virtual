@@ -76,6 +76,7 @@ public class VWebSocketManager {
         private @WsStatus int wsStatus = WsStatus.DISCONNECTED;
 
         private WsStatusListener wsStatusListener;
+        private WsSendListener wsSendListener;
         private final WebSocketListener webSocketListener = new WebSocketListener() {
             @Override
             public void onClosed(@NonNull WebSocket webSocket, int code, @NonNull String reason) {
@@ -152,6 +153,11 @@ public class VWebSocketManager {
 
         public Builder setWsStatusListener(WsStatusListener wsStatusListener) {
             this.wsStatusListener = wsStatusListener;
+            return this;
+        }
+
+        public Builder setWsSendListener(WsSendListener wsSendListener) {
+            this.wsSendListener = wsSendListener;
             return this;
         }
 
@@ -279,12 +285,22 @@ public class VWebSocketManager {
             if (this.webSocket != null) {
                 if (TextUtils.isEmpty(jsonStr)) {
                     Log.w("VWebSocketManager", "webSocket send is null.");
+                    if (this.wsSendListener != null) {
+                        this.wsSendListener.send(false, jsonStr);
+                    }
                     return false;
                 }
                 //Log.w("VWebSocketManager", "webSocket send jsonStr: " + jsonStr);
-                return this.webSocket.send(jsonStr);
+                boolean result = this.webSocket.send(jsonStr);
+                if (this.wsSendListener != null) {
+                    this.wsSendListener.send(result, jsonStr);
+                }
+                return result;
             } else {
                 Log.w("VWebSocketManager", "webSocket is null.");
+            }
+            if (this.wsSendListener != null) {
+                this.wsSendListener.send(false, jsonStr);
             }
             return false;
         }
@@ -338,5 +354,9 @@ public class VWebSocketManager {
 
     public interface WsStatusListener {
         void change(@WsStatus int status, String statusStr);
+    }
+
+    public interface WsSendListener {
+        void send(boolean result, String msg);
     }
 }
