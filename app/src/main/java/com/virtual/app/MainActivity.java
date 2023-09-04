@@ -1,5 +1,6 @@
 package com.virtual.app;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Process;
@@ -8,7 +9,6 @@ import android.view.View;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 
 import com.virtual.util.log.VLog;
@@ -16,7 +16,7 @@ import com.virtual.util.network.VDownloadManager;
 
 import java.util.Arrays;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends Activity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,10 +45,10 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        VLog.i("app", "MainActivity-onCreate " + Process.myUid() + " " + Process.myUserHandle().toString());
+        VLog.w("app", "MainActivity-onCreate " + Process.myUid() + " " + Process.myUserHandle().toString());
     }
 
-    private void testDownload(){
+    private void testDownload() {
         String path = getExternalFilesDir("apk") + "/app-yunguanjia-release.apk";
         if (VDownloadManager.instance().isDownload(path)) {
             VDownloadManager.instance().stopDownload(path);

@@ -2,11 +2,12 @@ package com.virtual.util.log.flavor;
 
 import android.util.Log;
 
-import com.virtual.util.log.VLogLevel;
 import com.virtual.util.log.VLevelString;
 import com.virtual.util.log.VLogConfig;
+import com.virtual.util.log.VLogLevel;
 
 import java.io.File;
+import java.io.FileFilter;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Calendar;
@@ -23,7 +24,11 @@ public class VSaveLog extends VBaseLog {
     public VSaveLog() {
         mSaveLevel = VLogConfig.instance().getSaveLevel();
         mSaveRootDir = VLogConfig.instance().getSaveRootDir();
+        long retainedTime = VLogConfig.instance().getRetainedTime();
         mExecutor = Executors.newSingleThreadExecutor();
+        if (retainedTime > 0L) {
+            mExecutor.execute(new DeleteLogFileThread(mSaveRootDir, retainedTime));
+        }
     }
 
     protected static class SaveTask implements Runnable {
@@ -90,11 +95,11 @@ public class VSaveLog extends VBaseLog {
         mExecutor.execute(new SaveTask(this, levelStr, tag, msg));
     }
 
-    private String repair0(int num) {
+    private static String repair0(int num) {
         return repair0(num, 2);
     }
 
-    private String repair0(int num, int digit) {
+    private static String repair0(int num, int digit) {
         String numStr = num + "";
         if (digit == 3) {
             int len = numStr.length();
@@ -174,6 +179,72 @@ public class VSaveLog extends VBaseLog {
     public void e(String tag, String msg, Throwable tr) {
         if (checkSave(VLogLevel.E)) {
             saveLogToFile(VLogLevel.E, tag, msg + " Throwable: " + Log.getStackTraceString(tr));
+        }
+    }
+
+    private static class DeleteLogFileThread extends Thread {
+        private final String path;
+        private final long retainedTime;
+
+        public DeleteLogFileThread(String path, long retainedTime) {
+            super("delete-log-file");
+            this.path = path;
+            this.retainedTime = retainedTime;
+        }
+
+        @Override
+        public void run() {
+            try {
+                File file = new File(this.path);
+                if (file.isDirectory()) {
+                    Calendar calendar = Calendar.getInstance();
+                    calendar.setTimeInMillis((System.currentTimeMillis() - this.retainedTime));
+                    int year = calendar.get(Calendar.YEAR);
+                    int month = calendar.get(Calendar.MONTH) + 1;
+                    int day = calendar.get(Calendar.DAY_OF_MONTH);
+
+                    String name = year + "" + repair0(month) + "" + repair0(day);
+                    long deleteTime = Long.parseLong(name);
+                    LogFileFilter filter = new LogFileFilter(deleteTime);
+                    File[] files = file.listFiles(filter);
+                    if (files != null) {
+                        int size = 0;
+                        for (File logFile : files) {
+                            if (logFile != null) {
+                                if (logFile.delete()) {
+                                    size++;
+                                }
+                            }
+                        }
+                        Log.d("VSaveLog", "delete logFile size: " + size);
+                    }
+                }
+            } catch (Throwable throwable) {
+                throwable.printStackTrace();
+            }
+        }
+    }
+
+    private static class LogFileFilter implements FileFilter {
+        private final long deleteTime;
+
+        LogFileFilter(long deleteTime) {
+            this.deleteTime = deleteTime;
+        }
+
+        @Override
+        public boolean accept(File pathname) {
+            try {
+                String name = pathname.getName();
+                int index = name.lastIndexOf(".");
+                name = name.substring(0, index);
+                long curTime = Long.parseLong(name);
+                Log.d("VSaveLog", "LogFileFilter curTime: " + curTime + " " + this.deleteTime);
+                return curTime < this.deleteTime;
+            } catch (Throwable throwable) {
+                throwable.printStackTrace();
+            }
+            return false;
         }
     }
 }

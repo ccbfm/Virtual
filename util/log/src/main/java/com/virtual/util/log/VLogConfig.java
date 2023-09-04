@@ -12,6 +12,7 @@ import com.virtual.util.log.flavor.VSaveLog;
 import java.io.File;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 public final class VLogConfig {
 
@@ -49,6 +50,7 @@ public final class VLogConfig {
     private int mSaveLevel = VLogLevel.NONE;
 
     private String mSaveRootDir;
+    private long mRetainedTime;
 
     private final List<IVLog> mILogs = new LinkedList<>();
 
@@ -68,6 +70,10 @@ public final class VLogConfig {
 
     private void setSaveRootDir(String saveRootDir) {
         mSaveRootDir = saveRootDir;
+    }
+
+    public void setRetainedTime(long retainedTime) {
+        mRetainedTime = retainedTime;
     }
 
     private void addILog(IVLog iLog) {
@@ -106,6 +112,10 @@ public final class VLogConfig {
         return mSaveRootDir;
     }
 
+    public long getRetainedTime() {
+        return mRetainedTime;
+    }
+
     public List<IVLog> getILogs() {
         return mILogs;
     }
@@ -135,6 +145,7 @@ public final class VLogConfig {
         private int saveLevel = VLogLevel.NONE;
         private IVLog saveLog;
         private String saveRootDir;
+        private long retainedTime;
 
         private List<IVLog> otherILogs;
 
@@ -168,6 +179,11 @@ public final class VLogConfig {
             return this;
         }
 
+        public Builder setRetainedTime(int day) {
+            this.retainedTime = TimeUnit.DAYS.toMillis(day);
+            return this;
+        }
+
         public Builder setOtherILogs(List<IVLog> otherILogs) {
             this.otherILogs = otherILogs;
             return this;
@@ -195,6 +211,10 @@ public final class VLogConfig {
                     throw new NullPointerException("Path saveRootDir is null.");
                 }
                 this.logConfig.setSaveRootDir(saveRootDir);
+                if(this.retainedTime == 0L){
+                    setRetainedTime(10);
+                }
+                this.logConfig.setRetainedTime(this.retainedTime);
 
                 IVLog saveLog = this.saveLog;
                 if (saveLog == null) {
