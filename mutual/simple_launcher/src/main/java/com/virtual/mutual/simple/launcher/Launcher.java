@@ -1,5 +1,6 @@
 package com.virtual.mutual.simple.launcher;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.ColorStateList;
@@ -22,7 +23,6 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.Nullable;
-import androidx.fragment.app.FragmentActivity;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -36,7 +36,7 @@ import com.virtual.mutual.simple.launcher.model.Shortcut;
 import java.util.LinkedList;
 import java.util.List;
 
-public class Launcher extends FragmentActivity {
+public class Launcher extends Activity {
 
     private static final String TAG = "Launcher";
     private AllAppsAnim mAllAppsAnim;
