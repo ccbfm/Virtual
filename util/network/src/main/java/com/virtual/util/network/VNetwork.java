@@ -51,10 +51,21 @@ public class VNetwork {
         return get(url, null, null);
     }
 
+    /**
+     * @param url    url
+     * @param params 参数
+     * @return 结果
+     */
     public static String get(String url, Map<String, String> params) {
         return get(url, params, null);
     }
 
+    /**
+     * @param url     url
+     * @param params  参数
+     * @param headers 请求头
+     * @return 结果
+     */
     public static String get(String url, Map<String, String> params, Map<String, String> headers) {
         if (checkUrl(url)) {
             return null;
@@ -84,10 +95,21 @@ public class VNetwork {
         runGet(url, null, null, callback);
     }
 
+    /**
+     * @param url      url
+     * @param params   参数
+     * @param callback callback
+     */
     public static void runGet(String url, Map<String, String> params, VNetworkCallback callback) {
         runGet(url, params, null, callback);
     }
 
+    /**
+     * @param url      url
+     * @param params   参数
+     * @param headers  请求头
+     * @param callback callback
+     */
     public static void runGet(String url,
                               Map<String, String> params,
                               Map<String, String> headers,
@@ -111,10 +133,21 @@ public class VNetwork {
         return post(url, null, null);
     }
 
+    /**
+     * @param url    url
+     * @param params 参数
+     * @return 结果
+     */
     public static String post(String url, Map<String, String> params) {
         return post(url, params, null);
     }
 
+    /**
+     * @param url     url
+     * @param params  参数
+     * @param headers 请求头
+     * @return 结果
+     */
     public static String post(String url, Map<String, String> params, Map<String, String> headers) {
         if (checkUrl(url)) {
             return null;
@@ -144,10 +177,21 @@ public class VNetwork {
         runPost(url, null, null, callback);
     }
 
+    /**
+     * @param url      url
+     * @param params   参数
+     * @param callback callback
+     */
     public static void runPost(String url, Map<String, String> params, VNetworkCallback callback) {
         runPost(url, params, null, callback);
     }
 
+    /**
+     * @param url      url
+     * @param params   参数
+     * @param headers  请求头
+     * @param callback callback
+     */
     public static void runPost(String url,
                                Map<String, String> params,
                                Map<String, String> headers,
