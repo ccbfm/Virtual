@@ -45,10 +45,10 @@ public class VWebSocketManager {
         mWebSocketMap.put(key, builder);
     }
 
-    public boolean sendMessage(@NonNull String url, String jsonStr) {
-        Builder builder = mWebSocketMap.get(url);
+    public boolean sendMessage(@NonNull String key, String jsonStr) {
+        Builder builder = mWebSocketMap.get(key);
         if (builder == null) {
-            Log.w("VWebSocketManager", "createWebSocket url " + url + " is not exist.");
+            Log.w("VWebSocketManager", "createWebSocket key " + key + " is not exist.");
             return false;
         }
         return builder.send(jsonStr);
