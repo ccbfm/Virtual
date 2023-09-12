@@ -35,14 +35,22 @@ public class VWebSocketManager {
 
     private final HashMap<String, Builder> mWebSocketMap = new HashMap<>();
 
-    public void startWebSocket(@NonNull String key, @NonNull Builder builder) {
-        Builder oldBuilder = mWebSocketMap.get(key);
-        if (oldBuilder != null) {
-            Log.w("VWebSocketManager", "createWebSocket key " + key + " is exist.");
-            return;
+    public boolean isExists(@NonNull String key) {
+        synchronized (mWebSocketMap) {
+            return mWebSocketMap.get(key) != null;
         }
-        builder.build();
-        mWebSocketMap.put(key, builder);
+    }
+
+    public void startWebSocket(@NonNull String key, @NonNull Builder builder) {
+        synchronized (mWebSocketMap) {
+            Builder oldBuilder = mWebSocketMap.get(key);
+            if (oldBuilder != null) {
+                Log.w("VWebSocketManager", "createWebSocket key " + key + " is exist.");
+                return;
+            }
+            builder.build();
+            mWebSocketMap.put(key, builder);
+        }
     }
 
     public boolean sendMessage(@NonNull String key, String jsonStr) {

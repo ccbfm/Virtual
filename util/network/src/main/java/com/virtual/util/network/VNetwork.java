@@ -56,7 +56,7 @@ public class VNetwork {
      * @param params 参数
      * @return 结果
      */
-    public static String get(String url, Map<String, String> params) {
+    public static String get(String url, Map<String, Object> params) {
         return get(url, params, null);
     }
 
@@ -66,7 +66,7 @@ public class VNetwork {
      * @param headers 请求头
      * @return 结果
      */
-    public static String get(String url, Map<String, String> params, Map<String, String> headers) {
+    public static String get(String url, Map<String, Object> params, Map<String, Object> headers) {
         if (checkUrl(url)) {
             return null;
         }
@@ -100,7 +100,7 @@ public class VNetwork {
      * @param params   参数
      * @param callback callback
      */
-    public static void runGet(String url, Map<String, String> params, VNetworkCallback callback) {
+    public static void runGet(String url, Map<String, Object> params, VNetworkCallback callback) {
         runGet(url, params, null, callback);
     }
 
@@ -111,8 +111,8 @@ public class VNetwork {
      * @param callback callback
      */
     public static void runGet(String url,
-                              Map<String, String> params,
-                              Map<String, String> headers,
+                              Map<String, Object> params,
+                              Map<String, Object> headers,
                               VNetworkCallback callback) {
         if (checkUrl(url)) {
             return;
@@ -138,7 +138,7 @@ public class VNetwork {
      * @param params 参数
      * @return 结果
      */
-    public static String post(String url, Map<String, String> params) {
+    public static String post(String url, Map<String, Object> params) {
         return post(url, params, null);
     }
 
@@ -148,7 +148,7 @@ public class VNetwork {
      * @param headers 请求头
      * @return 结果
      */
-    public static String post(String url, Map<String, String> params, Map<String, String> headers) {
+    public static String post(String url, Map<String, Object> params, Map<String, Object> headers) {
         if (checkUrl(url)) {
             return null;
         }
@@ -182,7 +182,7 @@ public class VNetwork {
      * @param params   参数
      * @param callback callback
      */
-    public static void runPost(String url, Map<String, String> params, VNetworkCallback callback) {
+    public static void runPost(String url, Map<String, Object> params, VNetworkCallback callback) {
         runPost(url, params, null, callback);
     }
 
@@ -193,8 +193,8 @@ public class VNetwork {
      * @param callback callback
      */
     public static void runPost(String url,
-                               Map<String, String> params,
-                               Map<String, String> headers,
+                               Map<String, Object> params,
+                               Map<String, Object> headers,
                                VNetworkCallback callback) {
         if (checkUrl(url)) {
             return;

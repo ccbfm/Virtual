@@ -22,17 +22,17 @@ public interface VApi {
     Call<ResponseBody> get(@Url String url);
 
     @GET
-    Call<ResponseBody> get(@Url String url, @QueryMap Map<String, String> params);
+    Call<ResponseBody> get(@Url String url, @QueryMap Map<String, Object> params);
 
     @GET
-    Call<ResponseBody> get(@Url String url, @QueryMap Map<String, String> params, @HeaderMap Map<String, String> headers);
+    Call<ResponseBody> get(@Url String url, @QueryMap Map<String, Object> params, @HeaderMap Map<String, Object> headers);
 
     @POST
-    Call<ResponseBody> post(@Url String url, @Body Map<String, String> params);
+    Call<ResponseBody> post(@Url String url, @Body Map<String, Object> params);
 
     @POST
-    Call<ResponseBody> post(@Url String url, @Body Map<String, String> params, @HeaderMap Map<String, String> headers);
+    Call<ResponseBody> post(@Url String url, @Body Map<String, Object> params, @HeaderMap Map<String, Object> headers);
 
     @POST
-    Call<ResponseBody> post(@Url String url, @Body RequestBody body, @HeaderMap Map<String, String> headers);
+    Call<ResponseBody> post(@Url String url, @Body RequestBody body, @HeaderMap Map<String, Object> headers);
 }
