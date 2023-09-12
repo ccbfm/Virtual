@@ -53,6 +53,15 @@ public class VWebSocketManager {
         }
     }
 
+    public void stopWebSocket(@NonNull String key) {
+        synchronized (mWebSocketMap) {
+            Builder builder = mWebSocketMap.remove(key);
+            if (builder != null) {
+                builder.close();
+            }
+        }
+    }
+
     public boolean sendMessage(@NonNull String key, String jsonStr) {
         Builder builder = mWebSocketMap.get(key);
         if (builder == null) {
