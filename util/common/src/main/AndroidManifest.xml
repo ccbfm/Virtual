@@ -3,7 +3,7 @@
 
     <application>
 
-        <provider
+        <!--<provider
             android:name="androidx.core.content.FileProvider"
             android:authorities="${applicationId}"
             android:exported="false"
@@ -11,6 +11,6 @@
             <meta-data
                 android:name="android.support.FILE_PROVIDER_PATHS"
                 android:resource="@xml/file_paths_public" />
-        </provider>
+        </provider>-->
     </application>
 </manifest>
