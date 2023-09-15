@@ -236,8 +236,12 @@ public class VSaveLog extends VBaseLog {
         public boolean accept(File pathname) {
             try {
                 String name = pathname.getName();
-                int index = name.lastIndexOf(".");
+                int index = name.indexOf("_");
+                if (index <= 0) {
+                    index = name.lastIndexOf(".");
+                }
                 name = name.substring(0, index);
+
                 long curTime = Long.parseLong(name);
                 Log.d("VSaveLog", "LogFileFilter curTime: " + curTime + " " + this.deleteTime);
                 return curTime < this.deleteTime;
