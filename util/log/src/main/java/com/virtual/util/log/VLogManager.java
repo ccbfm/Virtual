@@ -33,14 +33,12 @@ public class VLogManager {
         return mLogConfigMap.get(logTag);
     }
 
-    public void defaultConfig(@NonNull Context context, String tag, @VLogLevel int debugLevel, @VLogLevel int saveLevel) {
-        VLogConfig.Builder builder = new VLogConfig.Builder(context);
-        builder.setLogTag(tag)
-                .setDebugLevel(debugLevel)
-                .setSaveLevel(saveLevel);
-        mLogConfigMap.put(mDefaultLog, builder.build());
-    }
-
+    /**
+     * 添加对应tag logConfig
+     * 需要自己写 VLog
+     *
+     * @param tag tag
+     */
     public void createConfig(@NonNull Context context, String tag, @VLogLevel int debugLevel, @VLogLevel int saveLevel) {
         VLogConfig.Builder builder = new VLogConfig.Builder(context);
         builder.setLogTag(tag)
@@ -49,20 +47,24 @@ public class VLogManager {
         addVLogConfig(builder.build());
     }
 
-    public void defaultConfig(@NonNull Context context, String tag, boolean debug) {
+    /**
+     * 默认tag logConfig
+     * 直接使用 VLog
+     */
+    public void defaultConfig(@NonNull Context context, String tag, @VLogLevel int debugLevel, @VLogLevel int saveLevel) {
         VLogConfig.Builder builder = new VLogConfig.Builder(context);
         builder.setLogTag(tag)
-                .setDebugLevel(debug ? VLogLevel.D : VLogLevel.NONE)
-                .setSaveLevel(VLogLevel.W);
+                .setDebugLevel(debugLevel)
+                .setSaveLevel(saveLevel);
         mLogConfigMap.put(mDefaultLog, builder.build());
     }
 
+    public void defaultConfig(@NonNull Context context, String tag, boolean debug) {
+        defaultConfig(context, tag, (debug ? VLogLevel.D : VLogLevel.NONE), VLogLevel.W);
+    }
+
     public void defaultNotSaveConfig(@NonNull Context context, String tag, boolean debug) {
-        VLogConfig.Builder builder = new VLogConfig.Builder(context);
-        builder.setLogTag(tag)
-                .setDebugLevel(debug ? VLogLevel.D : VLogLevel.NONE)
-                .setSaveLevel(VLogLevel.NONE);
-        mLogConfigMap.put(mDefaultLog, builder.build());
+        defaultConfig(context, tag, (debug ? VLogLevel.D : VLogLevel.NONE), VLogLevel.NONE);
     }
 
     public VLogConfig getDefault() {

@@ -2,7 +2,6 @@ package com.virtual.use;
 
 import android.app.Application;
 
-import com.virtual.util.log.VLogConfig;
 import com.virtual.util.log.VLogExported;
 import com.virtual.util.log.VLogLevel;
 import com.virtual.util.log.VLogManager;
