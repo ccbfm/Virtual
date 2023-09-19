@@ -9,6 +9,8 @@ import android.view.accessibility.AccessibilityNodeInfo;
 
 import androidx.annotation.NonNull;
 
+import java.util.concurrent.LinkedBlockingQueue;
+
 public abstract class VAutoHandler extends Handler {
     private static final String TAG = "VAutoHandler";
 
@@ -60,6 +62,26 @@ public abstract class VAutoHandler extends Handler {
 
     public int getNextAHWhat() {
         return mNextAHWhat;
+    }
+
+    private LinkedBlockingQueue<String> mExeDataQueue;
+
+    public void offerString(String str) {
+        if (mExeDataQueue == null) {
+            mExeDataQueue = new LinkedBlockingQueue<>();
+        }
+        mExeDataQueue.offer(str);
+        if (getNextAHWhat() == AHWhat.IDLE) {
+            sendCheckEmptyMessageDelayed(AHWhat.IDLE, toIdleDelayTime());
+        }
+    }
+
+    public String pollString() {
+        return mExeDataQueue == null ? "" : mExeDataQueue.poll();
+    }
+
+    public int stringDataSize() {
+        return mExeDataQueue == null ? 0 : mExeDataQueue.size();
     }
 
     @Override
@@ -187,6 +209,10 @@ public abstract class VAutoHandler extends Handler {
                                         AccessibilityNodeInfo nodeInfo) throws Throwable;
 
     protected abstract void operateMessage(Context context, int what, int arg1, int arg2, Object obj) throws Throwable;
+
+    protected void toast(String msg) {
+        VAccessManager.instance().toast(msg);
+    }
 
     protected void back() {
         VAccessManager.instance().back();

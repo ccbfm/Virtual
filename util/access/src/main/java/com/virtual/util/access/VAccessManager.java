@@ -25,6 +25,12 @@ public class VAccessManager {
     private VAccessManager() {
     }
 
+    private VToastCallback mVToastCallback;
+
+    public void setVToastCallback(VToastCallback toastCallback) {
+        mVToastCallback = toastCallback;
+    }
+
     private final HashMap<Class<?>, VAutoHandler> mAutoHandlerMap = new HashMap<>();
 
     public void addVAutoHandler(VAutoHandler autoHandler) {
@@ -87,6 +93,14 @@ public class VAccessManager {
         }
         Intent intent = new Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS);
         activity.startActivity(intent);
+    }
+
+    public void toast(String msg) {
+        if (mVToastCallback != null) {
+            mVToastCallback.toast(msg);
+        } else {
+            Log.i(TAG, "toast msg " + msg);
+        }
     }
 
     public void back() {
