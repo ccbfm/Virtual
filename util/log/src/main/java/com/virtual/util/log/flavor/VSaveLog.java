@@ -2,6 +2,8 @@ package com.virtual.util.log.flavor;
 
 import android.util.Log;
 
+import androidx.annotation.NonNull;
+
 import com.virtual.util.log.VLevelString;
 import com.virtual.util.log.VLogConfig;
 import com.virtual.util.log.VLogLevel;
@@ -21,10 +23,11 @@ public class VSaveLog extends VBaseLog {
     protected final ExecutorService mExecutor;
     private static final int MAX_FILE_SIZE = 1024 * 1024 * 5;
 
-    public VSaveLog() {
-        mSaveLevel = VLogConfig.instance().getSaveLevel();
-        mSaveRootDir = VLogConfig.instance().getSaveRootDir();
-        long retainedTime = VLogConfig.instance().getRetainedTime();
+    public VSaveLog(@NonNull VLogConfig logConfig) {
+        super(logConfig);
+        mSaveLevel = logConfig.getSaveLevel();
+        mSaveRootDir = logConfig.getSaveRootDir();
+        long retainedTime = logConfig.getRetainedTime();
         mExecutor = Executors.newSingleThreadExecutor();
         if (retainedTime > 0L) {
             mExecutor.execute(new DeleteLogFileThread(mSaveRootDir, retainedTime));

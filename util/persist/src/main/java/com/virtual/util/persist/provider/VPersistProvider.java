@@ -36,16 +36,19 @@ public final class VPersistProvider extends ContentProvider {
     @Override
     public Cursor query(@NonNull Uri uri, @Nullable String[] projection, @Nullable String selection, @Nullable String[] selectionArgs, @Nullable String sortOrder) {
         //Log.e("VPersistProvider", "query-uri=" + uri + " " + Arrays.toString(selectionArgs));
-        if (Config.PATH_V_PERSIST.equals(uri.getPath().replaceAll("/", ""))) {
-            if (selectionArgs != null && selectionArgs.length == 2) {
-                try (MatrixCursor cursor = new MatrixCursor(new String[]{Config.KEY_VALUE})) {
-                    String persistName = selectionArgs[0];
-                    String key = selectionArgs[1];
-                    String value = VPersist.getValue(persistName, key);
-                    cursor.addRow(new Object[]{value});
-                    return cursor;
-                } catch (Throwable throwable) {
-                    Log.e("VPersistProvider", "query-Throwable=" + throwable.getMessage());
+        String path = uri.getPath();
+        if (path != null) {
+            if (Config.PATH_V_PERSIST.equals(path.replaceAll("/", ""))) {
+                if (selectionArgs != null && selectionArgs.length == 2) {
+                    try (MatrixCursor cursor = new MatrixCursor(new String[]{Config.KEY_VALUE})) {
+                        String persistName = selectionArgs[0];
+                        String key = selectionArgs[1];
+                        String value = VPersist.getValue(getContext(), persistName, key);
+                        cursor.addRow(new Object[]{value});
+                        return cursor;
+                    } catch (Throwable throwable) {
+                        Log.e("VPersistProvider", "query-Throwable=" + throwable.getMessage());
+                    }
                 }
             }
         }
@@ -61,15 +64,18 @@ public final class VPersistProvider extends ContentProvider {
     @Nullable
     @Override
     public Uri insert(@NonNull Uri uri, @Nullable ContentValues values) {
-        if (values != null) {
-            if (values.size() == 0) {
-                return null;
-            }
-            if (Config.PATH_V_PERSIST.equals(uri.getPath().replaceAll("/", ""))) {
-                String persistName = values.getAsString(Config.KEY_PERSIST_NAME);
-                String key = values.getAsString(Config.KEY_KEY);
-                String value = values.getAsString(Config.KEY_VALUE);
-                VPersist.setValue(persistName, key, value);
+        String path = uri.getPath();
+        if (path != null) {
+            if (values != null) {
+                if (values.size() == 0) {
+                    return null;
+                }
+                if (Config.PATH_V_PERSIST.equals(path.replaceAll("/", ""))) {
+                    String persistName = values.getAsString(Config.KEY_PERSIST_NAME);
+                    String key = values.getAsString(Config.KEY_KEY);
+                    String value = values.getAsString(Config.KEY_VALUE);
+                    VPersist.setValue(getContext(), persistName, key, value);
+                }
             }
         }
         return null;

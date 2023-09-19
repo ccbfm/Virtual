@@ -19,30 +19,6 @@ public final class VLogConfig {
     private VLogConfig() {
     }
 
-    private static final class Singleton {
-        private static final VLogConfig INSTANCE = new VLogConfig();
-    }
-
-    public static VLogConfig instance() {
-        return Singleton.INSTANCE;
-    }
-
-    public void defaultConfig(@NonNull Context context, String tag, boolean debug) {
-        createBuilder(context)
-                .setLogTag(tag)
-                .setDebugLevel(debug ? VLogLevel.D : VLogLevel.NONE)
-                .setSaveLevel(VLogLevel.W)
-                .build();
-    }
-
-    public void defaultNotSaveConfig(@NonNull Context context, String tag, boolean debug) {
-        createBuilder(context)
-                .setLogTag(tag)
-                .setDebugLevel(debug ? VLogLevel.D : VLogLevel.NONE)
-                .setSaveLevel(VLogLevel.NONE)
-                .build();
-    }
-
     private String mLogTag = "Default";
     @VLogLevel
     private int mDebugLevel = VLogLevel.NONE;
@@ -124,20 +100,14 @@ public final class VLogConfig {
         return mContext;
     }
 
-    public Builder createBuilder(@NonNull Context context) {
-        return new Builder(this, context);
-    }
-
     public static final class Builder {
-        private final VLogConfig logConfig;
         private final Context context;
 
-        public Builder(VLogConfig logConfig, @NonNull Context context) {
-            this.logConfig = logConfig;
+        public Builder(@NonNull Context context) {
             this.context = context;
         }
 
-        private String logTag = "Default";
+        private String logTag;
         @VLogLevel
         private int debugLevel = VLogLevel.NONE;
         private IVLog debugLog;
@@ -189,43 +159,56 @@ public final class VLogConfig {
             return this;
         }
 
-        public void build() {
-            this.logConfig.clearILogs();
-            this.logConfig.setLogTag(this.logTag);
+        public VLogConfig build() {
+            VLogConfig logConfig = new VLogConfig();
+            logConfig.clearILogs();
+            if (TextUtils.isEmpty(this.logTag)) {
+                throw new NullPointerException("logTag is null.");
+            }
+            logConfig.setLogTag(this.logTag);
+            logConfig.setContext(this.context);
             if (this.debugLevel < VLogLevel.NONE) {
-                this.logConfig.setDebugLevel(this.debugLevel);
+                logConfig.setDebugLevel(this.debugLevel);
                 IVLog debugLog = this.debugLog;
                 if (debugLog == null) {
-                    debugLog = new VPrintLog();
+                    debugLog = new VPrintLog(logConfig);
                 }
-                this.logConfig.addILog(debugLog);
+                logConfig.addILog(debugLog);
             }
             if (this.saveLevel < VLogLevel.NONE) {
-                this.logConfig.setSaveLevel(this.saveLevel);
+                logConfig.setSaveLevel(this.saveLevel);
 
                 String saveRootDir = this.saveRootDir;
                 if (TextUtils.isEmpty(saveRootDir)) {
-                    saveRootDir = this.context.getExternalFilesDir("Log_" + this.logTag).getAbsolutePath();
+                    File file = this.context.getExternalFilesDir("Log_" + this.logTag);
+                    if (file != null) {
+                        try {
+                            saveRootDir = file.getCanonicalPath();
+                        } catch (Throwable throwable) {
+                            Log.e("VLogConfig", "build", throwable);
+                            saveRootDir = file.getAbsolutePath();
+                        }
+                    }
                 }
                 if (TextUtils.isEmpty(saveRootDir)) {
                     throw new NullPointerException("Path saveRootDir is null.");
                 }
-                this.logConfig.setSaveRootDir(saveRootDir);
-                if(this.retainedTime == 0L){
+                logConfig.setSaveRootDir(saveRootDir);
+                if (this.retainedTime == 0L) {
                     setRetainedTime(10);
                 }
-                this.logConfig.setRetainedTime(this.retainedTime);
+                logConfig.setRetainedTime(this.retainedTime);
 
                 IVLog saveLog = this.saveLog;
                 if (saveLog == null) {
-                    saveLog = new VSaveLog();
+                    saveLog = new VSaveLog(logConfig);
                 }
-                this.logConfig.addILog(saveLog);
+                logConfig.addILog(saveLog);
             }
             if (this.otherILogs != null) {
-                this.logConfig.addAllILog(this.otherILogs);
+                logConfig.addAllILog(this.otherILogs);
             }
-            this.logConfig.setContext(this.context);
+            return logConfig;
         }
     }
 

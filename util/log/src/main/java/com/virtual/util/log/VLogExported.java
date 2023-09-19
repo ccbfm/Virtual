@@ -112,7 +112,7 @@ public final class VLogExported {
         }
 
         private void exportedProvider(@VLogLevel int level, String tag, String msg) {
-            Context context = VLogConfig.instance().getContext();
+            Context context = VLogManager.instance().getDefault().getContext();
             if (context == null) {
                 Log.e("VLogExported", "exportedProvider context is null.");
                 return;
@@ -120,12 +120,13 @@ public final class VLogExported {
             Uri uri = checkProvider(context);
             try (ContentProviderClient client = context.getContentResolver()
                     .acquireUnstableContentProviderClient(uri)) {
-
-                ContentValues values = new ContentValues();
-                values.put(VLogProvider.Config.KEY_LEVEL, level);
-                values.put(VLogProvider.Config.KEY_TAG, tag);
-                values.put(VLogProvider.Config.KEY_MESSAGE, msg);
-                client.insert(uri, values);
+                if(client != null){
+                    ContentValues values = new ContentValues();
+                    values.put(VLogProvider.Config.KEY_LEVEL, level);
+                    values.put(VLogProvider.Config.KEY_TAG, tag);
+                    values.put(VLogProvider.Config.KEY_MESSAGE, msg);
+                    client.insert(uri, values);
+                }
             } catch (DeadObjectException exception) {
                 Log.e("VLogExported", "exportedProvider DeadObjectException.");
             } catch (Throwable throwable) {

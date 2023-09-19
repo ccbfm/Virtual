@@ -3,7 +3,7 @@ plugins {
 }
 
 android {
-    namespace 'com.virtual.generic.access'
+    namespace 'com.virtual.util.access'
     compileSdk rootProject.ext.android.compileSdk
 
     defaultConfig {

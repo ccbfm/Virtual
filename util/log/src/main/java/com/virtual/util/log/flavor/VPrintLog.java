@@ -2,6 +2,8 @@ package com.virtual.util.log.flavor;
 
 import android.util.Log;
 
+import androidx.annotation.NonNull;
+
 import com.virtual.util.log.VLogLevel;
 import com.virtual.util.log.VLogConfig;
 
@@ -9,8 +11,9 @@ public class VPrintLog extends VBaseLog {
     @VLogLevel
     protected final int mDebugLevel;
 
-    public VPrintLog() {
-        mDebugLevel = VLogConfig.instance().getDebugLevel();
+    public VPrintLog(@NonNull VLogConfig logConfig) {
+        super(logConfig);
+        mDebugLevel = logConfig.getDebugLevel();
     }
 
     protected boolean checkDebug(@VLogLevel int debugLevel) {

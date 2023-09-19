@@ -8,20 +8,22 @@ import android.net.Uri;
 import android.os.DeadObjectException;
 import android.util.Log;
 
-import com.virtual.util.context.VContextHolder;
 import com.virtual.util.persist.provider.VPersistProvider;
+
+import java.lang.ref.WeakReference;
 
 public final class VPersistExported {
 
     private static Uri sProviderUri;
+    private static WeakReference<Context> sContext;
 
-    public static void init(String packageName) {
-        init(providerUri(packageName));
+    public static void init(Context context, String packageName) {
+        init(context, providerUri(packageName));
     }
 
-    public static void init(Uri uri) {
+    public static void init(Context context, Uri uri) {
+        sContext = new WeakReference<>(context);
         sProviderUri = uri;
-
     }
 
     private static Uri checkProvider(Context context) {
@@ -29,6 +31,13 @@ public final class VPersistExported {
             sProviderUri = providerUri(context.getPackageName());
         }
         return sProviderUri;
+    }
+
+    private static Context context() {
+        if (sContext == null || sContext.get() == null) {
+            throw new NullPointerException("context is null.");
+        }
+        return sContext.get();
     }
 
     public static void setValue(String key, String value) {
@@ -40,7 +49,8 @@ public final class VPersistExported {
     }
 
     public static void setValue(String persistName, String key, String value) {
-        setValue(VContextHolder.instance().getContext(), persistName, key, value);
+        Context context = context();
+        setValue(context, persistName, key, value);
     }
 
     public static void setValue(Context context, String persistName, String key, String value) {
@@ -52,12 +62,13 @@ public final class VPersistExported {
 
         try (ContentProviderClient client = context.getContentResolver()
                 .acquireUnstableContentProviderClient(uri)) {
-
-            ContentValues values = new ContentValues();
-            values.put(VPersistProvider.Config.KEY_PERSIST_NAME, persistName);
-            values.put(VPersistProvider.Config.KEY_KEY, key);
-            values.put(VPersistProvider.Config.KEY_VALUE, value);
-            client.insert(sProviderUri, values);
+            if (client != null) {
+                ContentValues values = new ContentValues();
+                values.put(VPersistProvider.Config.KEY_PERSIST_NAME, persistName);
+                values.put(VPersistProvider.Config.KEY_KEY, key);
+                values.put(VPersistProvider.Config.KEY_VALUE, value);
+                client.insert(sProviderUri, values);
+            }
         } catch (DeadObjectException exception) {
             Log.e("VPersistExported", "setValue DeadObjectException.");
         } catch (Throwable throwable) {
@@ -74,7 +85,8 @@ public final class VPersistExported {
     }
 
     public static String getValue(String persistName, String key) {
-        return getValue(VContextHolder.instance().getContext(), persistName, key);
+        Context context = context();
+        return getValue(context, persistName, key);
     }
 
     public static String getValue(Context context, String persistName, String key) {
@@ -87,12 +99,13 @@ public final class VPersistExported {
 
         try (ContentProviderClient client = context.getContentResolver()
                 .acquireUnstableContentProviderClient(uri)) {
-
-            try (Cursor cursor = client.query(sProviderUri, null,
-                    null, new String[]{persistName, key}, "ASC")) {
-                if (cursor != null && cursor.getCount() > 0) {
-                    cursor.moveToFirst();
-                    return cursor.getString(0);
+            if (client != null) {
+                try (Cursor cursor = client.query(sProviderUri, null,
+                        null, new String[]{persistName, key}, "ASC")) {
+                    if (cursor != null && cursor.getCount() > 0) {
+                        cursor.moveToFirst();
+                        return cursor.getString(0);
+                    }
                 }
             }
         } catch (DeadObjectException exception) {
