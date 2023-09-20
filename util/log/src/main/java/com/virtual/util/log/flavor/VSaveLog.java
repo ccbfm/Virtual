@@ -1,5 +1,6 @@
 package com.virtual.util.log.flavor;
 
+import android.text.TextUtils;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
@@ -13,25 +14,28 @@ import java.io.FileFilter;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Calendar;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
+import java.util.concurrent.Executor;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
 public class VSaveLog extends VBaseLog {
     @VLogLevel
     protected final int mSaveLevel;
     protected final String mSaveRootDir;
-    protected final ExecutorService mExecutor;
+    protected final long mRetainedTime;
+    protected final Executor mExecutor;
     private static final int MAX_FILE_SIZE = 1024 * 1024 * 5;
+    private String mCurrentLogFileName;
 
     public VSaveLog(@NonNull VLogConfig logConfig) {
         super(logConfig);
         mSaveLevel = logConfig.getSaveLevel();
         mSaveRootDir = logConfig.getSaveRootDir();
-        long retainedTime = logConfig.getRetainedTime();
-        mExecutor = Executors.newSingleThreadExecutor();
-        if (retainedTime > 0L) {
-            mExecutor.execute(new DeleteLogFileThread(mSaveRootDir, retainedTime));
-        }
+        mRetainedTime = logConfig.getRetainedTime();
+        mExecutor = new ThreadPoolExecutor(0, 1,
+                60L, TimeUnit.SECONDS,
+                new LinkedBlockingQueue<Runnable>());
     }
 
     protected static class SaveTask implements Runnable {
@@ -119,6 +123,11 @@ public class VSaveLog extends VBaseLog {
 
         String name = year + "" + repair0(month) + "" + repair0(day) + ".txt";
 
+        if (!TextUtils.equals(mCurrentLogFileName, name)) {
+            mCurrentLogFileName = name;
+            Log.d("VSaveLog", "getOrCreateSaveFile clearOldLogFile");
+            clearOldLogFile();
+        }
         File file = new File(mSaveRootDir, name);
         if (file.length() >= MAX_FILE_SIZE) {
             int hour = calendar.get(Calendar.HOUR_OF_DAY);
@@ -130,7 +139,7 @@ public class VSaveLog extends VBaseLog {
             String rename = year + "" + repair0(month) + "" + repair0(day) + "_" + repair0(hour) + "" + repair0(minute) + "" + repair0(second) + "_" + repair0(millisecond, 3) + ".txt";
             File reFile = new File(mSaveRootDir, rename);
             if (!file.renameTo(reFile)) {
-                Log.d("SaveLog", "getOrCreateSaveFile-delete=" + file.delete());
+                Log.d("VSaveLog", "getOrCreateSaveFile delete " + file.delete());
             }
         }
         return file;
@@ -182,6 +191,13 @@ public class VSaveLog extends VBaseLog {
     public void e(String tag, String msg, Throwable tr) {
         if (checkSave(VLogLevel.E)) {
             saveLogToFile(VLogLevel.E, tag, msg + " Throwable: " + Log.getStackTraceString(tr));
+        }
+    }
+
+
+    protected void clearOldLogFile() {
+        if (mRetainedTime > 0L) {
+            mExecutor.execute(new DeleteLogFileThread(mSaveRootDir, mRetainedTime));
         }
     }
 
