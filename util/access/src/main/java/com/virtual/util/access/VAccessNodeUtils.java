@@ -43,6 +43,18 @@ public class VAccessNodeUtils {
         return false;
     }
 
+    public static String containsStr(String[] targets, CharSequence text) {
+        if (targets == null || text == null) {
+            return "";
+        }
+        for (String str : targets) {
+            if (contains(str, text)) {
+                return str;
+            }
+        }
+        return "";
+    }
+
     public static boolean equalsPackageName(AccessibilityNodeInfo root, @NonNull String packageName) {
         if (root == null) {
             return false;
@@ -120,7 +132,23 @@ public class VAccessNodeUtils {
         }, null);
     }
 
-    public static boolean scrollVerticalByNode(AccessibilityService service, AccessibilityNodeInfo nodeInfo, boolean up) {
+    public static boolean scrollVerticalByNode(AccessibilityService service,
+                                               AccessibilityNodeInfo nodeInfo,
+                                               boolean up) {
+        return scrollVerticalByNode(service, nodeInfo, up, 560L);
+    }
+
+    public static boolean scrollVerticalByNode(AccessibilityService service,
+                                               AccessibilityNodeInfo nodeInfo,
+                                               boolean up,
+                                               long duration) {
+        return scrollVerticalByNode(service, nodeInfo, up, duration, null);
+    }
+
+    public static boolean scrollVerticalByNode(AccessibilityService service,
+                                               AccessibilityNodeInfo nodeInfo,
+                                               boolean up, long duration,
+                                               AccessibilityService.GestureResultCallback callback) {
         if (service == null || nodeInfo == null) {
             return false;
         }
@@ -144,22 +172,26 @@ public class VAccessNodeUtils {
             path.lineTo(randomValue(x, w4), randomValue(y + h4, h16));
         }
         GestureDescription.Builder builder = new GestureDescription.Builder();
-        builder.addStroke(new GestureDescription.StrokeDescription(path, 0L, 100L));
+        builder.addStroke(new GestureDescription.StrokeDescription(path, 0L, duration));
         GestureDescription gesture = builder.build();
 
-        return service.dispatchGesture(gesture, new AccessibilityService.GestureResultCallback() {
-            @Override
-            public void onCompleted(GestureDescription gestureDescription) {
-                super.onCompleted(gestureDescription);
-                Log.i(TAG, "clickByNode onCompleted " + nodeInfo);
-            }
+        if (callback == null) {
+            return service.dispatchGesture(gesture, new AccessibilityService.GestureResultCallback() {
+                @Override
+                public void onCompleted(GestureDescription gestureDescription) {
+                    super.onCompleted(gestureDescription);
+                    Log.i(TAG, "clickByNode onCompleted " + nodeInfo);
+                }
 
-            @Override
-            public void onCancelled(GestureDescription gestureDescription) {
-                super.onCancelled(gestureDescription);
-                Log.i(TAG, "clickByNode onCancelled " + nodeInfo);
-            }
-        }, null);
+                @Override
+                public void onCancelled(GestureDescription gestureDescription) {
+                    super.onCancelled(gestureDescription);
+                    Log.i(TAG, "clickByNode onCancelled " + nodeInfo);
+                }
+            }, null);
+        } else {
+            return service.dispatchGesture(gesture, callback, null);
+        }
     }
 
 
