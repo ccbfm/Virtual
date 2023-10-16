@@ -5,6 +5,7 @@ import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
 import android.util.Log;
+import android.util.Pair;
 import android.view.accessibility.AccessibilityNodeInfo;
 
 import androidx.annotation.NonNull;
@@ -28,8 +29,9 @@ public abstract class VAutoHandler extends Handler {
 
     protected boolean mIsRunning = false;
 
-    public void start() {
+    public Pair<Boolean, String> start() {
         mIsRunning = true;
+        return new Pair<>(true, "");
     }
 
     public void stop() {
@@ -172,12 +174,14 @@ public abstract class VAutoHandler extends Handler {
                 setNextAHWhat(what);
             }
 
-            removeMessages(AHWhat.IDLE);
             if (isExeApp()) {
                 mWaitExeMessage = null;
                 sendMessageDelayed(message, delayMillis);
-                if (what != AHWhat.IDLE) {
-                    sendEmptyMessageDelayed(AHWhat.IDLE, (delayMillis + noOpsDelayTime()));
+
+                long noOpsDelayTime = noOpsDelayTime();
+                if (noOpsDelayTime > 0L && what != AHWhat.IDLE) {
+                    removeMessages(AHWhat.IDLE);
+                    sendEmptyMessageDelayed(AHWhat.IDLE, (delayMillis + noOpsDelayTime));
                 }
             } else {
                 Log.i(TAG, "waitExeApp message " + message.what + " " +
@@ -191,8 +195,16 @@ public abstract class VAutoHandler extends Handler {
         return 2222L;
     }
 
+
+    /**
+     * 没有操作 noOpsDelayTime 时间后回到 IDLE
+     * 0L 否
+     * 大于0 是
+     *
+     * @return noOpsDelayTime 毫秒
+     */
     protected long noOpsDelayTime() {
-        return 20000L;
+        return 0L;
     }
 
     protected void removeCallbacksAndMessages() {

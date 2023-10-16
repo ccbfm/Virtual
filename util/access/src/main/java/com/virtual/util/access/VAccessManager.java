@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.provider.Settings;
 import android.util.Log;
+import android.util.Pair;
 import android.view.accessibility.AccessibilityNodeInfo;
 
 import java.lang.ref.WeakReference;
@@ -32,6 +33,7 @@ public class VAccessManager {
     }
 
     private final HashMap<Class<?>, VAutoHandler> mAutoHandlerMap = new HashMap<>();
+    private VAutoHandler mCurrentAutoHandler;
 
     public void addVAutoHandler(VAutoHandler autoHandler) {
         if (autoHandler == null) {
@@ -42,6 +44,31 @@ public class VAccessManager {
 
     public VAutoHandler getVAutoHandler(Class<?> clazz) {
         return mAutoHandlerMap.get(clazz);
+    }
+
+    public Pair<Boolean, String> start(Class<?> clazz) {
+        if (hasAutoService()) {
+            VAutoHandler autoHandler = getVAutoHandler(clazz);
+            if (mCurrentAutoHandler != null) {
+                if (mCurrentAutoHandler == autoHandler) {
+                    return new Pair<>(false, "已经在执行");
+                } else {
+                    mCurrentAutoHandler.stop();
+                }
+            }
+            if (autoHandler != null) {
+                mCurrentAutoHandler = autoHandler;
+                return autoHandler.start();
+            }
+        }
+        return new Pair<>(false, "服务未开启");
+    }
+
+    public void stop(Class<?> clazz) {
+        VAutoHandler autoHandler = getVAutoHandler(clazz);
+        if (autoHandler != null) {
+            autoHandler.stop();
+        }
     }
 
     private VAutoService mVAutoService;
