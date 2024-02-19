@@ -91,9 +91,7 @@ public final class VWorkPool {
         if (TextUtils.isEmpty(name) || userId < 0) {
             return null;
         }
-        String key = "[" + name + "][" + userId + "]";
-        Log.d("VWorkPool", "recordKey key " + key);
-        return key;
+        return "[" + name + "][" + userId + "]";
     }
 
     public void recordConnect(String name, int userId, VServerConnect connect) {
@@ -106,6 +104,7 @@ public final class VWorkPool {
             if (TextUtils.isEmpty(key)) {
                 return;
             }
+            Log.d("VWorkPool", "recordConnect key " + key);
             synchronized (mConnectMap) {
                 mConnectMap.put(key, connect);
             }

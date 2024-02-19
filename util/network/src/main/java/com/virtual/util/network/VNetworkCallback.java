@@ -14,7 +14,8 @@ public abstract class VNetworkCallback implements Callback<ResponseBody> {
         try {
             ResponseBody body = response.body();
             if (body != null) {
-                onResponseString(body.string());
+                String url = call.request().url().toString();
+                onResponseString(url, body.string());
             } else {
                 onFailure(call, new NullPointerException("body is null."));
             }
@@ -23,16 +24,17 @@ public abstract class VNetworkCallback implements Callback<ResponseBody> {
         }
     }
 
-    public void onResponseString(String result) {
+    public void onResponseString(String url, String result) throws Throwable {
 
     }
 
     @Override
     public void onFailure(@NonNull Call<ResponseBody> call, @NonNull Throwable throwable) {
-        onFailure(throwable);
+        String url = call.request().url().toString();
+        onFailure(url, throwable);
     }
 
-    public void onFailure(Throwable throwable) {
+    public void onFailure(String url, Throwable throwable) {
 
     }
 }
