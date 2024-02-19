@@ -48,6 +48,18 @@ public abstract class VServerConnect extends VWork {
         mSendLooper = sendLooper;
     }
 
+    public String getName() {
+        return mName;
+    }
+
+    public int getUid() {
+        return mUid;
+    }
+
+    public int getUserId() {
+        return mUserId;
+    }
+
     /**
      * android.os.NetworkOnMainThreadException
      *

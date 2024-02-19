@@ -91,7 +91,9 @@ public final class VWorkPool {
         if (TextUtils.isEmpty(name) || userId < 0) {
             return null;
         }
-        return "[" + name + "][" + userId + "]";
+        String key = "[" + name + "][" + userId + "]";
+        Log.d("VWorkPool", "recordKey key " + key);
+        return key;
     }
 
     public void recordConnect(String name, int userId, VServerConnect connect) {
