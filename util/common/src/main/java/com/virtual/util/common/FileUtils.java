@@ -1,36 +1,28 @@
 package com.virtual.util.common;
 
+import android.os.Build;
+
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
-import java.io.IOException;
 
 public class FileUtils {
 
-    public static void copyFile(String sourcePath, String targetPath) {
-        FileInputStream inputStream = null;
-        FileOutputStream outputStream = null;
-        try {
-            inputStream = new FileInputStream(sourcePath);
-            outputStream = new FileOutputStream(targetPath);
-
-            byte[] buffer = new byte[1024];
-            int length;
-            while ((length = inputStream.read(buffer)) > 0) {
-                outputStream.write(buffer, 0, length);
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        } finally {
-            try {
-                if (inputStream != null) {
-                    inputStream.close();
+    public static long copyFile(String sourcePath, String targetPath) throws Throwable {
+        try (FileInputStream inputStream = new FileInputStream(sourcePath);
+             FileOutputStream outputStream = new FileOutputStream(targetPath)) {
+            long all_len = 0L;
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                all_len = android.os.FileUtils.copy(inputStream, outputStream);
+            } else {
+                byte[] buffer = new byte[1024];
+                int length;
+                while ((length = inputStream.read(buffer)) > 0) {
+                    all_len += length;
+                    outputStream.write(buffer, 0, length);
                 }
-                if (outputStream != null) {
-                    outputStream.close();
-                }
-            } catch (IOException e) {
-                e.printStackTrace();
             }
+            outputStream.flush();
+            return all_len;
         }
     }
 }
