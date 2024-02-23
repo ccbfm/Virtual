@@ -294,30 +294,34 @@ public class VWebSocketManager {
 
         private void sendPing() {
             if (this.wsStatus == WsStatus.CONNECTED) {
-                send(this.pingString);
+                send(true, this.pingString);
             }
         }
 
         public boolean send(String jsonStr) {
+            return send(false, jsonStr);
+        }
+
+        public boolean send(boolean ping, String jsonStr) {
             if (this.webSocket != null) {
                 if (TextUtils.isEmpty(jsonStr)) {
                     Log.w("VWebSocketManager", "webSocket send is null.");
                     if (this.wsSendListener != null) {
-                        this.wsSendListener.send(false, jsonStr);
+                        this.wsSendListener.send(false, ping, jsonStr);
                     }
                     return false;
                 }
                 //Log.w("VWebSocketManager", "webSocket send jsonStr: " + jsonStr);
                 boolean result = this.webSocket.send(jsonStr);
                 if (this.wsSendListener != null) {
-                    this.wsSendListener.send(result, jsonStr);
+                    this.wsSendListener.send(result, ping, jsonStr);
                 }
                 return result;
             } else {
                 Log.w("VWebSocketManager", "webSocket is null.");
             }
             if (this.wsSendListener != null) {
-                this.wsSendListener.send(false, jsonStr);
+                this.wsSendListener.send(false, ping, jsonStr);
             }
             return false;
         }
@@ -374,6 +378,6 @@ public class VWebSocketManager {
     }
 
     public interface WsSendListener {
-        void send(boolean result, String msg);
+        void send(boolean result, boolean ping, String msg);
     }
 }

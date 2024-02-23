@@ -7,6 +7,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
@@ -152,5 +153,33 @@ public final class VFileIO {
 
     public interface OnProgressUpdateListener {
         void onProgressUpdate(double progress);
+    }
+
+    public static void copyFile(String sourcePath, String targetPath) {
+        FileInputStream inputStream = null;
+        FileOutputStream outputStream = null;
+        try {
+            inputStream = new FileInputStream(sourcePath);
+            outputStream = new FileOutputStream(targetPath);
+
+            byte[] buffer = new byte[1024];
+            int length;
+            while ((length = inputStream.read(buffer)) > 0) {
+                outputStream.write(buffer, 0, length);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                if (inputStream != null) {
+                    inputStream.close();
+                }
+                if (outputStream != null) {
+                    outputStream.close();
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
     }
 }
