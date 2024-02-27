@@ -2,6 +2,7 @@ package com.virtual.util.common;
 
 import android.os.Build;
 
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 
@@ -24,5 +25,22 @@ public class FileUtils {
             outputStream.flush();
             return all_len;
         }
+    }
+
+    public static boolean deleteDirFiles(File file) {
+        if (file != null && file.exists()) {
+            if (file.isDirectory()) {
+                File[] listFiles = file.listFiles();
+                if (listFiles != null) {
+                    for (File childFile : listFiles) {
+                        if (!deleteDirFiles(childFile)) {
+                            return false;
+                        }
+                    }
+                }
+            }
+            return file.delete();
+        }
+        return false;
     }
 }
