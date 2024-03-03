@@ -27,7 +27,7 @@ public class ParseUtils {
     }
 
     public static double parseDouble(String s) {
-        return parseDouble(s, 0);
+        return parseDouble(s, 0D);
     }
 
     public static double parseDouble(String s, double defaultDouble) {
