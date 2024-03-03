@@ -75,33 +75,30 @@ public class AppLoad {
                 } else {
                     resolveInfoList = pm.queryIntentActivities(intent, 0);
                 }
-                if (resolveInfoList != null) {
-                    for (ResolveInfo info : resolveInfoList) {
-                        CharSequence label = info.loadLabel(pm);
-                        Drawable icon = info.loadIcon(pm);
-                        String packageName = info.activityInfo.packageName;
+                for (ResolveInfo info : resolveInfoList) {
+                    CharSequence label = info.loadLabel(pm);
+                    Drawable icon = info.loadIcon(pm);
+                    String packageName = info.activityInfo.packageName;
 
-                        Intent intentT = new Intent();
-                        intentT.setComponent(new ComponentName(packageName, info.activityInfo.name));
-                        intentT.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                    Intent intentT = new Intent();
+                    intentT.setComponent(new ComponentName(packageName, info.activityInfo.name));
+                    intentT.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 
-                        boolean hasWorkplace = false;
-                        App wApp = mWorkspaces.get(packageName);
-                        if (wApp != null) {
-                            wApp.name = label;
-                            wApp.icon = icon;
-                            wApp.packageName = packageName;
-                            wApp.intent = intentT;
-                            hasWorkplace = true;
-                        }
-                        App app = new App(label, icon, packageName, intentT);
-                        app.hasWorkplace = hasWorkplace;
-                        mAllApps.add(app);
+                    boolean hasWorkplace = false;
+                    App wApp = mWorkspaces.get(packageName);
+                    if (wApp != null) {
+                        wApp.name = label;
+                        wApp.icon = icon;
+                        wApp.packageName = packageName;
+                        wApp.intent = intentT;
+                        hasWorkplace = true;
                     }
-                    mWorkspaceApps.addAll(mWorkspaces.values());
-                    return mAllApps;
+                    App app = new App(label, icon, packageName, intentT);
+                    app.hasWorkplace = hasWorkplace;
+                    mAllApps.add(app);
                 }
-                return null;
+                mWorkspaceApps.addAll(mWorkspaces.values());
+                return mAllApps;
             }
 
             @Override
