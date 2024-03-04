@@ -7,6 +7,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import java.util.HashMap;
+import java.util.Map;
 import java.util.Set;
 
 public class VSpConfig {
@@ -117,6 +118,14 @@ public class VSpConfig {
 
         public boolean getBoolean(String key, boolean defValue) {
             return this.sp.getBoolean(key, defValue);
+        }
+
+        public void clear() {
+            this.sp.edit().clear().apply();
+        }
+
+        public Map<String, ?> getAll() {
+            return this.sp.getAll();
         }
     }
 }
