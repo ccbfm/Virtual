@@ -12,6 +12,8 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
+import java.nio.ByteBuffer;
+import java.nio.channels.FileChannel;
 
 public final class VFileIO {
 
@@ -49,6 +51,19 @@ public final class VFileIO {
             e.printStackTrace();
             return false;
         }
+    }
+
+    public static boolean writeFileFromBytes(String path, byte[] bytes) {
+        //指定写到哪个路径中
+        try (FileOutputStream out = new FileOutputStream(path)) {
+            FileChannel fileChannel = out.getChannel();
+            fileChannel.write(ByteBuffer.wrap(bytes)); //将字节流写入文件中
+            fileChannel.force(true);//强制刷新
+            return true;
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return false;
     }
 
     public static String readFileToString(final String filePath) {

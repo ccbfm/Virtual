@@ -4,10 +4,12 @@ import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.drawable.GradientDrawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
 import android.webkit.WebResourceRequest;
@@ -15,6 +17,7 @@ import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.FrameLayout;
+import android.widget.TextView;
 
 import androidx.annotation.Nullable;
 
@@ -54,6 +57,7 @@ public class LocationWebActivity extends Activity {
                                 Log.d(TAG, "shouldOverrideUrlLoading-latng=" + latng);
                                 if (!TextUtils.isEmpty(latng)) {
                                     Intent resultIntent = new Intent();
+                                    resultIntent.putExtra("location_action", "ok");
                                     resultIntent.putExtra("location_result", latng);
                                     setResult(RESULT_OK, resultIntent);
                                     LocationWebActivity.this.finish();
@@ -72,7 +76,40 @@ public class LocationWebActivity extends Activity {
 
         content.addView(webView, new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
                 ViewGroup.LayoutParams.MATCH_PARENT));
+
+        int hp = getResources().getDisplayMetrics().heightPixels;
+        TextView textView = new TextView(this);
+        textView.setGravity(Gravity.CENTER);
+        textView.setText("取消");
+        int tw = hp >> 4;
+        textView.setBackground(createCircleDrawable((tw >> 1)));
+        FrameLayout.LayoutParams tLp = new FrameLayout.LayoutParams(tw, tw);
+        tLp.gravity = Gravity.CENTER_VERTICAL | Gravity.END;
+        content.addView(textView, tLp);
+        textView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent resultIntent = new Intent();
+                resultIntent.putExtra("location_action", "cancel");
+                resultIntent.putExtra("location_result", "");
+                setResult(RESULT_OK, resultIntent);
+                LocationWebActivity.this.finish();
+            }
+        });
+
         return content;
+    }
+
+    private static GradientDrawable createCircleDrawable(float radius) {
+        GradientDrawable background = new GradientDrawable();
+        background.setShape(GradientDrawable.RECTANGLE);
+        //设置背景色
+        background.setColor(0xFFFFFFFF);
+        //设置边线粗细，颜色
+        background.setStroke(2, 0xFF000000);
+        //设置圆角弧度
+        background.setCornerRadius(radius);
+        return background;
     }
 
     /**

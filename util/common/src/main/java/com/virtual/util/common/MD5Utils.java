@@ -13,9 +13,13 @@ public class MD5Utils {
      * @return String
      */
     public static String md5Decode(String content) {
+        return md5Decode(content.getBytes(StandardCharsets.UTF_8));
+    }
+
+    public static String md5Decode(byte[] bytes) {
         byte[] hash;
         try {
-            hash = MessageDigest.getInstance("MD5").digest(content.getBytes(StandardCharsets.UTF_8));
+            hash = MessageDigest.getInstance("MD5").digest(bytes);
         } catch (NoSuchAlgorithmException e) {
             throw new RuntimeException("NoSuchAlgorithmException", e);
         }
@@ -29,6 +33,5 @@ public class MD5Utils {
         }
         return hex.toString();
     }
-
 
 }
