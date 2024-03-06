@@ -3,8 +3,6 @@ package com.virtual.util.common;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
@@ -18,12 +16,7 @@ public class ZipFileUtils {
     public static void zipFiles(String srcFileString,
                                 String zipFileString) throws Exception {
         //创建ZIP
-        ZipOutputStream outZip = null;
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
-            outZip = new ZipOutputStream(Files.newOutputStream(Paths.get(zipFileString)));
-        } else {
-            outZip = new ZipOutputStream(new FileOutputStream(zipFileString));
-        }
+        ZipOutputStream outZip = new ZipOutputStream(new FileOutputStream(zipFileString));
         //创建文件
         File file = new File(srcFileString);
         //压缩
@@ -61,7 +54,7 @@ public class ZipFileUtils {
             if (fileList != null && fileList.length > 0) {
                 //子文件和递归
                 for (String s : fileList) {
-                    zipFiles(rootPath + folderString, fileString + File.separator, s, zipOutputSteam);
+                    zipFiles(rootPath, folderString + fileString + File.separator, s, zipOutputSteam);
                 }
             } else {
                 ZipEntry zipEntry = new ZipEntry(name);

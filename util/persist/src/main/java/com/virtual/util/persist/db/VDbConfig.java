@@ -112,5 +112,11 @@ public class VDbConfig {
             return this;
         }
 
+        public void deleteAll() {
+            for (IVDao dao : this.daoMap.values()) {
+                dao.delete(null, null);
+            }
+        }
+
     }
 }
