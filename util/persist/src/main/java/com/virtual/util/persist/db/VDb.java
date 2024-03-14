@@ -14,6 +14,11 @@ public final class VDb {
         return VDbConfig.instance().getDb(context, name, tableName);
     }
 
+    public static VDbConfig.Builder getDb(Context context, String name) {
+        return get(context, name, "");
+    }
+
+
     public static <T extends IVDao> T getVDao(Context context, String tableName, Class<T> clazz) {
         return getVDao(context, VDbConfig.DEFAULT_DB_NAME, tableName, clazz);
     }

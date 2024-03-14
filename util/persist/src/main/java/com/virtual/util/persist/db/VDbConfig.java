@@ -43,8 +43,6 @@ public class VDbConfig {
                         .setVersion(1)
                         .addIVDao(new VDbPersistDao(tableName))
                         .build();
-            } else {
-                throw new NullPointerException("Db Builder is null.");
             }
         }
         return builder;
