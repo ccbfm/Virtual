@@ -124,6 +124,14 @@ public class VSpConfig {
             this.sp.edit().clear().apply();
         }
 
+        public void remove(String key) {
+            this.sp.edit().remove(key).apply();
+        }
+
+        public SharedPreferences.Editor edit() {
+            return this.sp.edit();
+        }
+
         public Map<String, ?> getAll() {
             return this.sp.getAll();
         }
