@@ -36,8 +36,9 @@ public class LocationWebActivity extends Activity {
     @SuppressLint("SetJavaScriptEnabled")
     private View initView(Context context) {
         FrameLayout content = new FrameLayout(context);
-
+        //RTNBZ-76S64-IYWUB-D5WRM-JBXEK-R6FLS
         String url = "https://apis.map.qq.com/tools/locpicker?search=1&type=0&backurl=http://callback&key=RTNBZ-76S64-IYWUB-D5WRM-JBXEK-R6FLS&referer=MyApp";
+        //String url = "https://mapapi.qq.com/web/mapComponents/locationPicker/v/index.html?search=1&type=0&backurl=http://callback&key=00e3d061e7debe5f88aec44e0b549b76&referer=MyApp";
         WebView webView = new WebView(context);
         WebSettings webSettings = webView.getSettings();
         webSettings.setJavaScriptEnabled(true);

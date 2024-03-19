@@ -20,29 +20,39 @@ public class PrintUtils {
 
     public static void pFieldsAllSuper(Object obj) {
         if (obj != null) {
-            pFieldsAllSuper(obj.getClass(), obj);
+            pFieldsAllSuper(obj.getClass(), false);
         }
     }
 
-    public static void pFieldsAllSuper(Class<?> clazz, Object obj) {
+    public static void pFieldsAllSuper(Object obj, boolean byteToStr) {
+        if (obj != null) {
+            pFieldsAllSuper(obj.getClass(), obj, byteToStr);
+        }
+    }
+
+    public static void pFieldsAllSuper(Class<?> clazz, Object obj, boolean byteToStr) {
         if (obj != null) {
             if (clazz == null) {
                 clazz = obj.getClass();
             }
             if (clazz != Object.class) {
-                pFields(clazz, obj);
-                pFieldsAllSuper(clazz.getSuperclass(), obj);
+                pFields(clazz, obj, byteToStr);
+                pFieldsAllSuper(clazz.getSuperclass(), obj, byteToStr);
             }
         }
     }
 
     public static void pFields(Object obj) {
+        pFields(obj, false);
+    }
+
+    public static void pFields(Object obj, boolean byteToStr) {
         if (obj != null) {
-            pFields(obj.getClass(), obj);
+            pFields(obj.getClass(), obj, byteToStr);
         }
     }
 
-    public static void pFields(Class<?> clazz, Object obj) {
+    public static void pFields(Class<?> clazz, Object obj, boolean byteToStr) {
         if (clazz == null || obj == null) {
             return;
         }
@@ -52,11 +62,16 @@ public class PrintUtils {
             for (Field f : fields) {
                 f.setAccessible(true);
                 try {
-                    Log.d(TAG, f.getName() + " = " + f.get(obj));
+                    Object fObj = f.get(obj);
+                    if (byteToStr) {
+                        if (fObj instanceof byte[]) {
+                            fObj = new String((byte[]) fObj);
+                        }
+                    }
+                    Log.d(TAG, f.getName() + " = " + fObj);
                 } catch (Throwable ignore) {
                     Log.d(TAG, f.getName() + " = ");
                 }
-
             }
             Log.d(TAG, "pFields end ");
         } catch (Throwable th) {
