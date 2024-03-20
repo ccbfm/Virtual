@@ -14,9 +14,10 @@ public class PackageUtils {
 
     public static String getVersionName(Context context, String packageName) {
         try {
-            PackageManager packageManager = context.getPackageManager();
-            PackageInfo packInfo = packageManager.getPackageInfo(packageName, 0);
-            return packInfo.versionName;
+            PackageInfo packInfo = getVersionInfo(context, packageName);
+            if (packInfo != null) {
+                return packInfo.versionName;
+            }
         } catch (Throwable e) {
             Log.e("PackageUtils", "getVersionName Throwable ", e);
         }
@@ -29,16 +30,27 @@ public class PackageUtils {
 
     public static long getVersionCode(Context context, String packageName) {
         try {
-            PackageManager packageManager = context.getPackageManager();
-            PackageInfo packInfo = packageManager.getPackageInfo(packageName, 0);
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
-                return packInfo.getLongVersionCode();
-            } else {
-                return packInfo.versionCode;
+            PackageInfo packInfo = getVersionInfo(context, packageName);
+            if (packInfo != null) {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+                    return packInfo.getLongVersionCode();
+                } else {
+                    return packInfo.versionCode;
+                }
             }
         } catch (Throwable e) {
             Log.e("PackageUtils", "getVersionCode Throwable ", e);
         }
         return 0L;
+    }
+
+    public static PackageInfo getVersionInfo(Context context, String packageName) {
+        try {
+            PackageManager packageManager = context.getPackageManager();
+            return packageManager.getPackageInfo(packageName, 0);
+        } catch (Throwable e) {
+            Log.e("PackageUtils", "getVersionInfo Throwable ", e);
+        }
+        return null;
     }
 }
