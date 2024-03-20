@@ -20,7 +20,7 @@ public class PrintUtils {
 
     public static void pFieldsAllSuper(Object obj) {
         if (obj != null) {
-            pFieldsAllSuper(obj.getClass(), false);
+            pFieldsAllSuper(obj.getClass(), obj, false);
         }
     }
 
