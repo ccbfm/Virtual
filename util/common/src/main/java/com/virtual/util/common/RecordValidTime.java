@@ -14,18 +14,18 @@ public class RecordValidTime {
     }
 
     public void conductData(long currentTime) {
-        HashSet<String> removeKeySet = new HashSet<>();
         if (mRecordMap.size() > 0) {
+            HashSet<String> removeKeySet = new HashSet<>();
             for (Map.Entry<String, Long> entry : mRecordMap.entrySet()) {
                 if (entry.getValue() + mDelayTime > currentTime) {
                     continue;
                 }
                 removeKeySet.add(entry.getKey());
             }
-        }
-        if (removeKeySet.size() > 0) {
-            for (String key : removeKeySet) {
-                mRecordMap.remove(key);
+            if (removeKeySet.size() > 0) {
+                for (String key : removeKeySet) {
+                    mRecordMap.remove(key);
+                }
             }
         }
     }
