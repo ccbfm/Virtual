@@ -13,6 +13,7 @@ import android.widget.Toast;
 
 import androidx.activity.result.ActivityResult;
 import androidx.activity.result.ActivityResultCallback;
+import androidx.annotation.CallSuper;
 import androidx.annotation.IdRes;
 import androidx.annotation.LayoutRes;
 import androidx.annotation.NonNull;
@@ -105,6 +106,7 @@ public abstract class BaseActivity<Data extends BasePackData, Presenter extends 
         Toast.makeText(this, toastMsg, Toast.LENGTH_SHORT).show();
     }
 
+    @CallSuper
     @Override
     protected void onDestroy() {
         super.onDestroy();
@@ -164,6 +166,6 @@ public abstract class BaseActivity<Data extends BasePackData, Presenter extends 
             mResultActivityCallbacks = new SparseArray<>(2);
         }
         mResultActivityCallbacks.put(requestCode, callback);
-        startActivityForResult(intent, requestCode);
+        ActivityCompat.startActivityForResult(this, intent, requestCode, null);
     }
 }
