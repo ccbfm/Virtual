@@ -13,6 +13,7 @@ import androidx.activity.result.ActivityResult;
 import androidx.activity.result.ActivityResultCallback;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
+import androidx.annotation.CallSuper;
 import androidx.annotation.IdRes;
 import androidx.annotation.LayoutRes;
 import androidx.annotation.NonNull;
@@ -102,6 +103,7 @@ public abstract class BaseComponentActivity<Data extends BasePackData, Presenter
         Toast.makeText(this, toastMsg, Toast.LENGTH_SHORT).show();
     }
 
+    @CallSuper
     @Override
     protected void onDestroy() {
         super.onDestroy();
