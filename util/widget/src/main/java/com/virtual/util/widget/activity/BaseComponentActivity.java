@@ -9,12 +9,18 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.activity.ComponentActivity;
+import androidx.activity.result.ActivityResult;
+import androidx.activity.result.ActivityResultCallback;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.IdRes;
 import androidx.annotation.LayoutRes;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.virtual.util.widget.VViewStorage;
+
+import java.util.Map;
 
 public abstract class BaseComponentActivity<Data extends BasePackData, Presenter extends BasePresenter<Data>>
         extends ComponentActivity implements BaseView<Data> {
@@ -88,8 +94,12 @@ public abstract class BaseComponentActivity<Data extends BasePackData, Presenter
     @Override
     public void presenterCallback(int action, Data data) {
         if (action == BasePackData.Action.SHOW_TOAST) {
-            Toast.makeText(this, data.mToastMsg, Toast.LENGTH_SHORT).show();
+            showToast(data.mToastMsg);
         }
+    }
+
+    protected void showToast(String toastMsg) {
+        Toast.makeText(this, toastMsg, Toast.LENGTH_SHORT).show();
     }
 
     @Override
@@ -98,5 +108,24 @@ public abstract class BaseComponentActivity<Data extends BasePackData, Presenter
         if (mPresenter != null) {
             mPresenter.destroy();
         }
+    }
+
+
+    protected void requestPermissions(String[] permissions,
+                                      ActivityResultCallback<Map<String, Boolean>> callback) {
+        ActivityResultLauncher<String[]> launcher = registerForActivityResult(
+                new ActivityResultContracts.RequestMultiplePermissions(),
+                callback
+        );
+        launcher.launch(permissions);
+    }
+
+    protected void startActivity(Intent intent,
+                                 ActivityResultCallback<ActivityResult> callback) {
+        ActivityResultLauncher<Intent> launcher = registerForActivityResult(
+                new ActivityResultContracts.StartActivityForResult(),
+                callback
+        );
+        launcher.launch(intent);
     }
 }

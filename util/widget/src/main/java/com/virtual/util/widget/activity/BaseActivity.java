@@ -3,18 +3,27 @@ package com.virtual.util.widget.activity;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.util.SparseArray;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.activity.result.ActivityResult;
+import androidx.activity.result.ActivityResultCallback;
 import androidx.annotation.IdRes;
 import androidx.annotation.LayoutRes;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.app.ActivityCompat;
 
 import com.virtual.util.widget.VViewStorage;
+
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 
 public abstract class BaseActivity<Data extends BasePackData, Presenter extends BasePresenter<Data>>
         extends Activity implements BaseView<Data> {
@@ -88,8 +97,12 @@ public abstract class BaseActivity<Data extends BasePackData, Presenter extends 
     @Override
     public void presenterCallback(int action, Data data) {
         if (action == BasePackData.Action.SHOW_TOAST) {
-            Toast.makeText(this, data.mToastMsg, Toast.LENGTH_SHORT).show();
+            showToast(data.mToastMsg);
         }
+    }
+
+    protected void showToast(String toastMsg) {
+        Toast.makeText(this, toastMsg, Toast.LENGTH_SHORT).show();
     }
 
     @Override
@@ -98,5 +111,59 @@ public abstract class BaseActivity<Data extends BasePackData, Presenter extends 
         if (mPresenter != null) {
             mPresenter.destroy();
         }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (mResultPermissionCallbacks == null) {
+            return;
+        }
+        ActivityResultCallback<Map<String, Boolean>> callback = mResultPermissionCallbacks.get(requestCode);
+        if (callback != null) {
+            mResultPermissionCallbacks.remove(requestCode);
+            Map<String, Boolean> map = new HashMap<>();
+            int length = permissions.length;
+            for (int i = 0; i < length; i++) {
+                map.put(permissions[i], grantResults[i] == PackageManager.PERMISSION_GRANTED);
+            }
+            callback.onActivityResult(map);
+        }
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (mResultActivityCallbacks == null) {
+            return;
+        }
+        ActivityResultCallback<ActivityResult> callback = mResultActivityCallbacks.get(requestCode);
+        if (callback != null) {
+            mResultActivityCallbacks.remove(requestCode);
+            callback.onActivityResult(new ActivityResult(resultCode, data));
+        }
+    }
+
+    private SparseArray<ActivityResultCallback<Map<String, Boolean>>> mResultPermissionCallbacks;
+    private SparseArray<ActivityResultCallback<ActivityResult>> mResultActivityCallbacks;
+
+    protected void requestPermissions(String[] permissions,
+                                      ActivityResultCallback<Map<String, Boolean>> callback) {
+        int requestCode = Arrays.hashCode(permissions);
+        if (mResultPermissionCallbacks == null) {
+            mResultPermissionCallbacks = new SparseArray<>(2);
+        }
+        mResultPermissionCallbacks.put(requestCode, callback);
+        ActivityCompat.requestPermissions(this, permissions, requestCode);
+    }
+
+    protected void startActivity(Intent intent,
+                                 ActivityResultCallback<ActivityResult> callback) {
+        int requestCode = intent.filterHashCode();
+        if (mResultActivityCallbacks == null) {
+            mResultActivityCallbacks = new SparseArray<>(2);
+        }
+        mResultActivityCallbacks.put(requestCode, callback);
+        startActivityForResult(intent, requestCode);
     }
 }
