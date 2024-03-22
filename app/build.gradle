@@ -85,6 +85,9 @@ dependencies {
     implementation rootProject.ext.library.okhttp_interceptor
     implementation project(path: ':generic:zxing')
     implementation project(path: ':generic:location')
+
+    implementation files('../libs/DialogX-0.0.49.aar')
+    implementation files('../libs/DialogXInterface-5.aar')
 }
 
 tasks.whenTaskAdded {task ->

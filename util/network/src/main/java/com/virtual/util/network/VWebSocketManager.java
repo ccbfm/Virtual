@@ -359,7 +359,7 @@ public class VWebSocketManager {
         int RECONNECT = 3;
     }
 
-    private static String stringWsStatus(@WsStatus int status) {
+    public static String stringWsStatus(@WsStatus int status) {
         switch (status) {
             case WsStatus.DISCONNECTED:
                 return "未链接";
