@@ -8,5 +8,5 @@ public interface BaseView<Data extends BasePackData> {
 
     Context context();
 
-    void presenterCallback(int action, @NonNull Data data);
+    void presenterCallback(int action, Data data);
 }

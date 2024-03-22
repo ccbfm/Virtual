@@ -1,6 +1,7 @@
 package com.virtual.util.widget.activity;
 
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -15,10 +16,11 @@ import androidx.annotation.Nullable;
 
 import com.virtual.util.widget.VViewStorage;
 
-public abstract class BaseComponentActivity<Data extends BasePackData> extends ComponentActivity implements BaseView<Data> {
+public abstract class BaseComponentActivity<Data extends BasePackData, Presenter extends BasePresenter<Data>>
+        extends ComponentActivity implements BaseView<Data> {
 
     protected VViewStorage mViewStorage;
-    protected BasePresenter<Data> mPresenter;
+    protected Presenter mPresenter;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -39,11 +41,14 @@ public abstract class BaseComponentActivity<Data extends BasePackData> extends C
         mViewStorage = new VViewStorage(contentView);
         setContentView(contentView);
         mPresenter = createPresenter();
+        if (mPresenter != null) {
+            mPresenter.setView(this);
+        }
         initView();
         initData();
     }
 
-    protected BasePresenter<Data> createPresenter() {
+    protected Presenter createPresenter() {
         return null;
     }
 
@@ -63,6 +68,14 @@ public abstract class BaseComponentActivity<Data extends BasePackData> extends C
 
     }
 
+    public @NonNull Intent getIntent() {
+        Intent intent = super.getIntent();
+        if (intent == null) {
+            intent = new Intent();
+        }
+        return intent;
+    }
+
     public <T extends View> T getView(@IdRes int viewId) {
         return mViewStorage.getView(viewId);
     }
@@ -73,7 +86,7 @@ public abstract class BaseComponentActivity<Data extends BasePackData> extends C
     }
 
     @Override
-    public void presenterCallback(int action, @NonNull Data data) {
+    public void presenterCallback(int action, Data data) {
         if (action == BasePackData.Action.SHOW_TOAST) {
             Toast.makeText(this, data.mToastMsg, Toast.LENGTH_SHORT).show();
         }
