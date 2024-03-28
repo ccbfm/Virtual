@@ -1,6 +1,6 @@
 package com.virtual.util.widget.activity;
 
-public class BasePackData {
+public class VBasePackData {
 
     public String mToastMsg;
 

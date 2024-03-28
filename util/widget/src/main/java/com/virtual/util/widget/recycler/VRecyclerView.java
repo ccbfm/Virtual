@@ -6,10 +6,11 @@ import android.widget.FrameLayout;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.recyclerview.widget.RecyclerView;
 
 public class VRecyclerView extends FrameLayout {
 
-
+    private RecyclerView mRecyclerView;
 
     public VRecyclerView(@NonNull Context context) {
         super(context);

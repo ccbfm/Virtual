@@ -16,7 +16,7 @@ public final class VViewStorage {
     }
 
     @SuppressWarnings("unchecked")
-    public <T extends View> T getView(@IdRes int viewId) {
+    public <T extends View> T findView(@IdRes int viewId) {
         View view = mViews.get(viewId);
         if (view == null) {
             view = mRootView.findViewById(viewId);

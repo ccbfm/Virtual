@@ -17,7 +17,7 @@ public class VViewHolder extends RecyclerView.ViewHolder {
         mViewStorage = new VViewStorage(itemView);
     }
 
-    public <T extends View> T getView(@IdRes int viewId) {
-        return mViewStorage.getView(viewId);
+    public <T extends View> T findView(@IdRes int viewId) {
+        return mViewStorage.findView(viewId);
     }
 }

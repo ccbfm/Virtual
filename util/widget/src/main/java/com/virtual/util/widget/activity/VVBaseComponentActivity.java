@@ -23,8 +23,8 @@ import com.virtual.util.widget.VViewStorage;
 
 import java.util.Map;
 
-public abstract class BaseComponentActivity<Data extends BasePackData, Presenter extends BasePresenter<Data>>
-        extends ComponentActivity implements BaseView<Data> {
+public abstract class VVBaseComponentActivity<Data extends VBasePackData, Presenter extends VBasePresenter<Data>>
+        extends ComponentActivity implements VBaseView<Data> {
 
     protected VViewStorage mViewStorage;
     protected Presenter mPresenter;
@@ -83,8 +83,8 @@ public abstract class BaseComponentActivity<Data extends BasePackData, Presenter
         return intent;
     }
 
-    public <T extends View> T getView(@IdRes int viewId) {
-        return mViewStorage.getView(viewId);
+    public <T extends View> T findView(@IdRes int viewId) {
+        return mViewStorage.findView(viewId);
     }
 
     @Override
@@ -94,7 +94,7 @@ public abstract class BaseComponentActivity<Data extends BasePackData, Presenter
 
     @Override
     public void presenterCallback(int action, Data data) {
-        if (action == BasePackData.Action.SHOW_TOAST) {
+        if (action == VBasePackData.Action.SHOW_TOAST) {
             showToast(data.mToastMsg);
         }
     }

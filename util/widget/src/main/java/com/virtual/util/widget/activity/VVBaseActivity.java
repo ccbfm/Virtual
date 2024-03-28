@@ -26,8 +26,8 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
-public abstract class BaseActivity<Data extends BasePackData, Presenter extends BasePresenter<Data>>
-        extends Activity implements BaseView<Data> {
+public abstract class VVBaseActivity<Data extends VBasePackData, Presenter extends VBasePresenter<Data>>
+        extends Activity implements VBaseView<Data> {
 
     protected VViewStorage mViewStorage;
     protected Presenter mPresenter;
@@ -86,8 +86,8 @@ public abstract class BaseActivity<Data extends BasePackData, Presenter extends 
         return intent;
     }
 
-    public <T extends View> T getView(@IdRes int viewId) {
-        return mViewStorage.getView(viewId);
+    public <T extends View> T findView(@IdRes int viewId) {
+        return mViewStorage.findView(viewId);
     }
 
     @Override
@@ -97,7 +97,7 @@ public abstract class BaseActivity<Data extends BasePackData, Presenter extends 
 
     @Override
     public void presenterCallback(int action, Data data) {
-        if (action == BasePackData.Action.SHOW_TOAST) {
+        if (action == VBasePackData.Action.SHOW_TOAST) {
             showToast(data.mToastMsg);
         }
     }

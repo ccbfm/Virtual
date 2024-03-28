@@ -33,8 +33,9 @@ public class ZipFileUtils {
                                  String folderString,
                                  String fileString,
                                  ZipOutputStream zipOutputSteam) throws Exception {
-        if (zipOutputSteam == null)
+        if (zipOutputSteam == null) {
             return;
+        }
         File file = new File(rootPath + folderString + fileString);
         String name = folderString + fileString;
         if (file.isFile()) {
@@ -54,7 +55,7 @@ public class ZipFileUtils {
             if (fileList != null && fileList.length > 0) {
                 //子文件和递归
                 for (String s : fileList) {
-                    zipFiles(rootPath, folderString + fileString + File.separator, s, zipOutputSteam);
+                    zipFiles(rootPath, name + File.separator, s, zipOutputSteam);
                 }
             } else {
                 ZipEntry zipEntry = new ZipEntry(name);

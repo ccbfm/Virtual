@@ -4,7 +4,7 @@ import android.content.Context;
 import android.os.Handler;
 import android.os.Looper;
 
-public abstract class BasePresenter<Data extends BasePackData> {
+public abstract class VBasePresenter<Data extends VBasePackData> {
 
     private Handler mMainHandler;
 
@@ -15,13 +15,13 @@ public abstract class BasePresenter<Data extends BasePackData> {
         return mMainHandler;
     }
 
-    protected BaseView<Data> mView;
+    protected VBaseView<Data> mView;
 
-    public BasePresenter() {
+    public VBasePresenter() {
 
     }
 
-    public void setView(BaseView<Data> view) {
+    public void setView(VBaseView<Data> view) {
         mView = view;
     }
 

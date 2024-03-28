@@ -2,9 +2,7 @@ package com.virtual.util.widget.activity;
 
 import android.content.Context;
 
-import androidx.annotation.NonNull;
-
-public interface BaseView<Data extends BasePackData> {
+public interface VBaseView<Data extends VBasePackData> {
 
     Context context();
 
