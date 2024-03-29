@@ -1,5 +1,7 @@
 package com.virtual.util.common;
 
+import android.util.Log;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -15,12 +17,15 @@ public class ZipFileUtils {
      */
     public static void zipFiles(String srcFileString,
                                 String zipFileString) throws Exception {
+        File file = new File(srcFileString);
+        if (!file.exists()) {
+            Log.w("ZipFileUtils", "zipFiles srcFile is not exists");
+            return;
+        }
         //创建ZIP
         ZipOutputStream outZip = new ZipOutputStream(new FileOutputStream(zipFileString));
-        //创建文件
-        File file = new File(srcFileString);
         //压缩
-        zipFiles(file.getParent() + File.separator, "" + File.separator, file.getName(), outZip);
+        zipFiles(file.getParent(), "", file.getName(), outZip);
         //完成和关闭
         outZip.finish();
         outZip.close();
@@ -36,8 +41,8 @@ public class ZipFileUtils {
         if (zipOutputSteam == null) {
             return;
         }
-        File file = new File(rootPath + folderString + fileString);
-        String name = folderString + fileString;
+        String name = folderString + File.separator + fileString;
+        File file = new File(rootPath + name);
         if (file.isFile()) {
             ZipEntry zipEntry = new ZipEntry(name);
             FileInputStream inputStream = new FileInputStream(file);
@@ -54,8 +59,8 @@ public class ZipFileUtils {
             //没有子文件和压缩
             if (fileList != null && fileList.length > 0) {
                 //子文件和递归
-                for (String s : fileList) {
-                    zipFiles(rootPath, name + File.separator, s, zipOutputSteam);
+                for (String childFile : fileList) {
+                    zipFiles(rootPath, name, childFile, zipOutputSteam);
                 }
             } else {
                 ZipEntry zipEntry = new ZipEntry(name);
