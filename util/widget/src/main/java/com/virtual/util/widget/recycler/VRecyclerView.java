@@ -13,15 +13,15 @@ public class VRecyclerView extends FrameLayout {
     private RecyclerView mRecyclerView;
 
     public VRecyclerView(@NonNull Context context) {
-        super(context);
+        this(context, null);
     }
 
     public VRecyclerView(@NonNull Context context, @Nullable AttributeSet attrs) {
-        super(context, attrs);
+        this(context, attrs, 0);
     }
 
     public VRecyclerView(@NonNull Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
-        super(context, attrs, defStyleAttr);
+        this(context, attrs, defStyleAttr, 0);
     }
 
     public VRecyclerView(@NonNull Context context, @Nullable AttributeSet attrs, int defStyleAttr, int defStyleRes) {
