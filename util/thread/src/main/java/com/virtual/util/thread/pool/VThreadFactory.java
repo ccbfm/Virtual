@@ -15,6 +15,7 @@ public final class VThreadFactory extends AtomicLong implements ThreadFactory {
     private final String mNamePrefix;
     private final int mPriority;
     private final boolean mIsDaemon;
+    private Thread.UncaughtExceptionHandler mUncaughtExceptionHandler;
 
     VThreadFactory(String prefix, int priority) {
         this(prefix, priority, false);
@@ -26,6 +27,10 @@ public final class VThreadFactory extends AtomicLong implements ThreadFactory {
                 "-thread-";
         this.mPriority = priority;
         this.mIsDaemon = isDaemon;
+    }
+
+    public void setUncaughtExceptionHandler(Thread.UncaughtExceptionHandler uncaughtExceptionHandler) {
+        mUncaughtExceptionHandler = uncaughtExceptionHandler;
     }
 
     @Override
@@ -45,6 +50,9 @@ public final class VThreadFactory extends AtomicLong implements ThreadFactory {
             @Override
             public void uncaughtException(@NonNull Thread t, @NonNull Throwable e) {
                 System.out.println("Throwable:" + e);
+                if (mUncaughtExceptionHandler != null) {
+                    mUncaughtExceptionHandler.uncaughtException(t, e);
+                }
             }
         });
         t.setPriority(mPriority);

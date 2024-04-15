@@ -12,6 +12,7 @@ public final class VThreadPoolExecutor extends ThreadPoolExecutor {
     private final AtomicInteger mSubmittedCount = new AtomicInteger();
 
     private final VLinkedBlockingQueue mWorkQueue;
+    private final VThreadFactory mVThreadFactory;
 
     public VThreadPoolExecutor(int corePoolSize,
                                int maximumPoolSize,
@@ -20,8 +21,13 @@ public final class VThreadPoolExecutor extends ThreadPoolExecutor {
                                VLinkedBlockingQueue workQueue,
                                VThreadFactory threadFactory) {
         super(corePoolSize, maximumPoolSize, keepAliveTime, unit, workQueue, threadFactory);
+        mVThreadFactory = threadFactory;
         workQueue.mPool = this;
         mWorkQueue = workQueue;
+    }
+
+    public VThreadFactory getVThreadFactory() {
+        return mVThreadFactory;
     }
 
     public int getSubmittedCount() {
