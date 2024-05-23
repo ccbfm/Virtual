@@ -27,6 +27,7 @@ public class VSaveLog extends VBaseLog {
     protected final Executor mExecutor;
     private static final int MAX_FILE_SIZE = 1024 * 1024 * 5;
     private String mCurrentLogFileName;
+    private static final int MAX_ALL_FILE_SIZE = 1024 * 1024 * 100;
 
     public VSaveLog(@NonNull VLogConfig logConfig) {
         super(logConfig);
@@ -130,16 +131,22 @@ public class VSaveLog extends VBaseLog {
         }
         File file = new File(mSaveRootDir, name);
         if (file.length() >= MAX_FILE_SIZE) {
-            int hour = calendar.get(Calendar.HOUR_OF_DAY);
-            int minute = calendar.get(Calendar.MINUTE);
-            int second = calendar.get(Calendar.SECOND);
+            //int hour = calendar.get(Calendar.HOUR_OF_DAY);
+            //int minute = calendar.get(Calendar.MINUTE);
+            //int second = calendar.get(Calendar.SECOND);
+            //int millisecond = calendar.get(Calendar.MILLISECOND);
 
-            int millisecond = calendar.get(Calendar.MILLISECOND);
-
-            String rename = year + "" + repair0(month) + "" + repair0(day) + "_" + repair0(hour) + "" + repair0(minute) + "" + repair0(second) + "_" + repair0(millisecond, 3) + ".txt";
+            //String rename = year + "" + repair0(month) + "" + repair0(day) + "_" + repair0(hour) + "" + repair0(minute) + "" + repair0(second) + "_" + repair0(millisecond, 3) + ".txt";
+            String rename = year + "" + repair0(month) + "" + repair0(day) + "_1.txt";
             File reFile = new File(mSaveRootDir, rename);
+            if (reFile.exists()) {
+                Log.d("VSaveLog", "getOrCreateSaveFile reFile delete " + reFile.delete());
+            }
             if (!file.renameTo(reFile)) {
-                Log.d("VSaveLog", "getOrCreateSaveFile delete " + file.delete());
+                if (file.delete()) {
+                    Log.d("VSaveLog", "getOrCreateSaveFile delete file");
+                    file = new File(mSaveRootDir, name);
+                }
             }
         }
         return file;
@@ -215,6 +222,9 @@ public class VSaveLog extends VBaseLog {
         public void run() {
             try {
                 File file = new File(this.path);
+                if (getFolderSize(file) > MAX_ALL_FILE_SIZE) {
+                    Log.d("VSaveLog", "delete rootFile " + deleteFile(file));
+                }
                 if (file.isDirectory()) {
                     Calendar calendar = Calendar.getInstance();
                     calendar.setTimeInMillis((System.currentTimeMillis() - this.retainedTime));
@@ -241,6 +251,43 @@ public class VSaveLog extends VBaseLog {
             } catch (Throwable throwable) {
                 throwable.printStackTrace();
             }
+        }
+
+        private long getFolderSize(File directory) {
+            if (directory == null) {
+                return 0L;
+            }
+            if (directory.isFile()) {
+                return directory.length();
+            }
+            long length = 0;
+            File[] files = directory.listFiles();
+            if (files != null) {
+                for (File file : files) {
+                    if (file.isFile()) {
+                        length += file.length();
+                    } else {
+                        length += getFolderSize(file);
+                    }
+                }
+            }
+            return length;
+        }
+
+        public static boolean deleteFile(File file) {
+            if (file.isDirectory()) {
+                File[] children = file.listFiles();
+                if (children == null) {
+                    return true;
+                }
+                for (File child : children) {
+                    boolean success = deleteFile(child);
+                    if (!success) {
+                        return false;
+                    }
+                }
+            }
+            return file.delete();
         }
     }
 
