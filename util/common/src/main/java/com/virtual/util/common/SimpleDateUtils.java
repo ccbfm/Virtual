@@ -15,6 +15,7 @@ public class SimpleDateUtils {
     @Retention(RetentionPolicy.SOURCE)
     public @interface Pattern {
         String yyyyMMdd = "yyyyMMdd";
+        String yyyyMMdd2 = "yyyy-MM-dd";
         String yyyyMMddHHmmss = "yyyy-MM-dd HH:mm:ss";
     }
 
