@@ -3,6 +3,7 @@ package com.virtual.util.common;
 import android.os.Build;
 
 import java.io.File;
+import java.io.FileFilter;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 
@@ -43,4 +44,19 @@ public class FileUtils {
         }
         return false;
     }
+
+
+    public static class LogFileFilter implements FileFilter {
+        private final long mDeleteTime;
+
+        public LogFileFilter(long deleteTime) {
+            mDeleteTime = deleteTime;
+        }
+
+        @Override
+        public boolean accept(File pathname) {
+            return pathname.lastModified() < mDeleteTime;
+        }
+    }
+
 }
