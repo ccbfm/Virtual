@@ -38,7 +38,7 @@ public abstract class VNetworkCallback implements Callback<ResponseBody> {
 
     }
 
-    public @interface FailType {
+    public interface FailType {
         int RESPONSE_BODY = 1;
         int NETWORK = RESPONSE_BODY + 1;
         int PROGRAM = NETWORK + 1;
