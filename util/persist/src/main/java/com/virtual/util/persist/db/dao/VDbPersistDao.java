@@ -65,4 +65,8 @@ public class VDbPersistDao extends VBaseDao {
         values.put("update_time", System.currentTimeMillis());
         return this.update(values, "key=?", new String[]{model.key});
     }
+
+    public int deleteModel(String key) {
+        return this.delete("key=?", new String[]{key});
+    }
 }
