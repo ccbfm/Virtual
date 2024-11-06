@@ -78,4 +78,8 @@ public class VDbPersistDao extends VBaseDao {
     public int deleteModel(String key) {
         return this.delete("key=?", new String[]{key});
     }
+
+    public int deleteByDisable(int disable) {
+        return this.delete("disable=?", new String[]{disable + ""});
+    }
 }
