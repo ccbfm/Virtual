@@ -16,8 +16,16 @@ public abstract class VNetworkCallback implements Callback<ResponseBody> {
             String url = call.request().url().toString();
             if (body != null) {
                 onResponseString(url, body.string());
+                body.close();
             } else {
-                onFailure(FailType.RESPONSE_BODY, url, new NullPointerException("body is null."));
+                String message = "";
+                ResponseBody errorBody = response.errorBody();
+                if (errorBody != null) {
+                    message = errorBody.string();
+                    errorBody.close();
+                }
+                String thMessage = response.code() + " " + message + " " + response.message();
+                onFailure(FailType.RESPONSE_BODY, url, new Throwable(thMessage));
             }
         } catch (Throwable throwable) {
             onFailure(FailType.PROGRAM, "", throwable);
