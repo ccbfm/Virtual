@@ -66,6 +66,25 @@ public class VDbPersistDao extends VBaseDao {
         return insert(null, contentValues);
     }
 
+    public long insertModel(VDbPersist model) {
+        ContentValues contentValues = new ContentValues();
+        contentValues.put("key", model.key);
+        contentValues.put("value", model.value);
+        contentValues.put("disable", model.disable);
+        contentValues.put("update_time", System.currentTimeMillis());
+        return insert(null, contentValues);
+    }
+
+    public long insertOrUpdateModel(VDbPersist model) {
+        String key = model.key;
+        VDbPersist persist = query(key);
+        if (persist != null) {
+            return (long) updateModel(model);
+        } else {
+            return insertModel(model);
+        }
+    }
+
     public int updateModel(VDbPersist model) {
         ContentValues values = new ContentValues();
         values.put("key", model.key);
