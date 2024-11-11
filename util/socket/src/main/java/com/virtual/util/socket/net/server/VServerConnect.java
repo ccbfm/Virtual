@@ -83,6 +83,39 @@ public abstract class VServerConnect extends VWork {
         return mHandlerThread.getLooper();
     }
 
+    public Handler getAcceptHandler() {
+        if (mAcceptHandler == null) {
+            mAcceptHandler = new Handler(acceptLooper()) {
+                @Override
+                public void handleMessage(@NonNull Message msg) {
+                    if (msg.what == 1) {
+                        String result = (String) msg.obj;
+                        handleResult(result);
+                    }
+                }
+            };
+        }
+        return mAcceptHandler;
+    }
+
+    public Handler getSendHandler() {
+        if (mSendHandler == null) {
+            mSendHandler = new Handler(sendLooper()) {
+                @Override
+                public void handleMessage(@NonNull Message msg) {
+                    if (msg.what == 1) {
+                        String text = (String) msg.obj;
+                        if (mWriter != null) {
+                            mWriter.println(text);
+                            mWriter.flush();
+                        }
+                    }
+                }
+            };
+        }
+        return mSendHandler;
+    }
+
     private void checkHandlerThread() {
         if (mHandlerThread == null) {
             mHandlerThread = new HandlerThread("server-connect");
@@ -116,23 +149,14 @@ public abstract class VServerConnect extends VWork {
                     throw new NullPointerException("VServerConnect connected is null.{ " + mName + " , " + mUserId + " }");
                 }
                 recordConnect(mName, mUserId);
+            } else if (result.startsWith("ping")) {
+                send("ping");
             } else {
-                if (mAcceptHandler == null) {
-                    mAcceptHandler = new Handler(acceptLooper()) {
-                        @Override
-                        public void handleMessage(@NonNull Message msg) {
-                            if (msg.what == 1) {
-                                String result = (String) msg.obj;
-                                handleResult(result);
-                            }
-                        }
-                    };
-                }
-
+                Handler acceptHandler = getAcceptHandler();
                 Message message = Message.obtain();
                 message.what = 1;
                 message.obj = result;
-                mAcceptHandler.sendMessage(message);
+                acceptHandler.sendMessage(message);
             }
         }
     }
@@ -153,27 +177,18 @@ public abstract class VServerConnect extends VWork {
     }
 
     public void send(final String text) {
+        send(text, 0L);
+    }
+
+    public void send(final String text, long delayMillis) {
         if (mWriter == null) {
             return;
         }
-        if (mSendHandler == null) {
-            mSendHandler = new Handler(sendLooper()) {
-                @Override
-                public void handleMessage(@NonNull Message msg) {
-                    if (msg.what == 1) {
-                        String text = (String) msg.obj;
-                        if (mWriter != null) {
-                            mWriter.println(text);
-                            mWriter.flush();
-                        }
-                    }
-                }
-            };
-        }
+        Handler sendHandler = getSendHandler();
         Message message = Message.obtain();
         message.what = 1;
         message.obj = text;
-        mSendHandler.sendMessage(message);
+        sendHandler.sendMessageDelayed(message, delayMillis);
     }
 
     @Override

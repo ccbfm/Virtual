@@ -15,8 +15,9 @@ import com.virtual.util.socket.net.work.VWorkClientPool;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
 import java.net.InetSocketAddress;
-import java.net.ServerSocket;
 import java.net.Socket;
 
 public abstract class VClient extends VWork {
@@ -35,6 +36,7 @@ public abstract class VClient extends VWork {
 
     /**
      * A valid port value is between 0 and 65535
+     *
      * @return port
      */
     protected abstract int port();
@@ -43,6 +45,15 @@ public abstract class VClient extends VWork {
     public abstract String name();
 
     protected int timeout() {
+        return 0;
+    }
+
+    /**
+     * 开启ping
+     *
+     * @return ping间隔时间 单位毫秒 0不开启；
+     */
+    protected int pingTime() {
         return 0;
     }
 
@@ -61,6 +72,43 @@ public abstract class VClient extends VWork {
     protected Looper sendLooper() {
         checkHandlerThread();
         return mHandlerThread.getLooper();
+    }
+
+    public Handler getAcceptHandler() {
+        if (mAcceptHandler == null) {
+            mAcceptHandler = new Handler(acceptLooper()) {
+                @Override
+                public void handleMessage(@NonNull Message msg) {
+                    int what = msg.what;
+                    if (what == HWhat.MESSAGE) {
+                        String result = (String) msg.obj;
+                        handleResult(result);
+                    } else if (what == HWhat.PING_TIMEOUT) {
+                        Log.d("VClient", "ping timeout: " + name());
+                        close();
+                    }
+                }
+            };
+        }
+        return mAcceptHandler;
+    }
+
+    public Handler getSendHandler() {
+        if (mSendHandler == null) {
+            mSendHandler = new Handler(sendLooper()) {
+                @Override
+                public void handleMessage(@NonNull Message msg) {
+                    if (msg.what == HWhat.MESSAGE) {
+                        String text = (String) msg.obj;
+                        if (mWriter != null) {
+                            mWriter.println(text);
+                            mWriter.flush();
+                        }
+                    }
+                }
+            };
+        }
+        return mSendHandler;
     }
 
     private void checkHandlerThread() {
@@ -92,24 +140,26 @@ public abstract class VClient extends VWork {
             }
             if (result.startsWith("connected")) {
                 send("connected" + name() + "#*#" + Process.myUid());
+                sendPing();
+            } else if (result.startsWith("ping")) {
+                sendPing();
             } else {
-                if (mAcceptHandler == null) {
-                    mAcceptHandler = new Handler(acceptLooper()) {
-                        @Override
-                        public void handleMessage(@NonNull Message msg) {
-                            if (msg.what == 1) {
-                                String result = (String) msg.obj;
-                                handleResult(result);
-                            }
-                        }
-                    };
-                }
-
+                Handler acceptHandler = getAcceptHandler();
                 Message message = Message.obtain();
-                message.what = 1;
+                message.what = HWhat.MESSAGE;
                 message.obj = result;
-                mAcceptHandler.sendMessage(message);
+                acceptHandler.sendMessage(message);
             }
+        }
+    }
+
+    private void sendPing() {
+        int pingTime = pingTime();
+        if (pingTime > 0) {
+            Handler acceptHandler = getAcceptHandler();
+            acceptHandler.removeMessages(HWhat.PING_TIMEOUT);
+            acceptHandler.sendEmptyMessageDelayed(HWhat.PING_TIMEOUT, (pingTime + 30_000));
+            send("ping", pingTime);
         }
     }
 
@@ -128,27 +178,18 @@ public abstract class VClient extends VWork {
     }
 
     public void send(final String text) {
+        send(text, 0L);
+    }
+
+    public void send(final String text, long delayMillis) {
         if (mWriter == null) {
             return;
         }
-        if (mSendHandler == null) {
-            mSendHandler = new Handler(sendLooper()) {
-                @Override
-                public void handleMessage(@NonNull Message msg) {
-                    if (msg.what == 1) {
-                        String text = (String) msg.obj;
-                        if (mWriter != null) {
-                            mWriter.println(text);
-                            mWriter.flush();
-                        }
-                    }
-                }
-            };
-        }
+        Handler sendHandler = getSendHandler();
         Message message = Message.obtain();
-        message.what = 1;
+        message.what = HWhat.MESSAGE;
         message.obj = text;
-        mSendHandler.sendMessage(message);
+        sendHandler.sendMessageDelayed(message, delayMillis);
     }
 
     @Override
@@ -177,5 +218,11 @@ public abstract class VClient extends VWork {
         } catch (Throwable throwable) {
             Log.e("VClient", "close Throwable: ", throwable);
         }
+    }
+
+    @Retention(RetentionPolicy.SOURCE)
+    private @interface HWhat {
+        int MESSAGE = 1;
+        int PING_TIMEOUT = MESSAGE + 1;
     }
 }
