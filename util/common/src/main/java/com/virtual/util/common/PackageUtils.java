@@ -1,6 +1,7 @@
 package com.virtual.util.common;
 
 import android.content.Context;
+import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.os.Build;
@@ -18,8 +19,8 @@ public class PackageUtils {
             if (packInfo != null) {
                 return packInfo.versionName;
             }
-        } catch (Throwable e) {
-            Log.e("PackageUtils", "getVersionName Throwable ", e);
+        } catch (Throwable throwable) {
+            Log.e("PackageUtils", "getVersionName Throwable ", throwable);
         }
         return "";
     }
@@ -38,8 +39,8 @@ public class PackageUtils {
                     return packInfo.versionCode;
                 }
             }
-        } catch (Throwable e) {
-            Log.e("PackageUtils", "getVersionCode Throwable ", e);
+        } catch (Throwable throwable) {
+            Log.e("PackageUtils", "getVersionCode Throwable ", throwable);
         }
         return 0L;
     }
@@ -48,8 +49,26 @@ public class PackageUtils {
         try {
             PackageManager packageManager = context.getPackageManager();
             return packageManager.getPackageInfo(packageName, 0);
-        } catch (Throwable e) {
-            Log.e("PackageUtils", "getVersionInfo Throwable ", e);
+        } catch (Throwable throwable) {
+            Log.e("PackageUtils", "getVersionInfo Throwable ", throwable);
+        }
+        return null;
+    }
+
+    public static ApplicationInfo getApplicationInfo(Context context, String packageName) {
+        try {
+            PackageManager packageManager = context.getPackageManager();
+            return packageManager.getApplicationInfo(packageName, 0);
+        } catch (Throwable throwable) {
+            Log.e("PackageUtils", "getApplicationInfo Throwable ", throwable);
+        }
+        return null;
+    }
+
+    public static String getAppSourceDir(Context context, String packageName) {
+        ApplicationInfo applicationInfo = getApplicationInfo(context, packageName);
+        if (applicationInfo != null) {
+            return applicationInfo.sourceDir;
         }
         return null;
     }
