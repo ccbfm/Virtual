@@ -20,7 +20,7 @@ import java.io.PrintWriter;
 public abstract class VLocalServerConnect extends VLocalWork {
     private final int mUid;
     private final int mPid;
-    private LocalSocket mLocalSocket;
+    private final LocalSocket mLocalSocket;
     private Looper mAcceptLooper;
     private Looper mSendLooper;
 
@@ -107,9 +107,13 @@ public abstract class VLocalServerConnect extends VLocalWork {
                     mAcceptHandler = new Handler(acceptLooper()) {
                         @Override
                         public void handleMessage(@NonNull Message msg) {
-                            if (msg.what == 1) {
-                                String result = (String) msg.obj;
-                                handleResult(result);
+                            try {
+                                if (msg.what == 1) {
+                                    String result = (String) msg.obj;
+                                    handleResult(result);
+                                }
+                            } catch (Throwable throwable) {
+                                Log.e("VLocalServerConnect", "mAcceptHandler Throwable: ", throwable);
                             }
                         }
                     };
@@ -145,12 +149,16 @@ public abstract class VLocalServerConnect extends VLocalWork {
             mSendHandler = new Handler(sendLooper()) {
                 @Override
                 public void handleMessage(@NonNull Message msg) {
-                    if (msg.what == 1) {
-                        String text = (String) msg.obj;
-                        if (mWriter != null) {
-                            mWriter.println(text);
-                            mWriter.flush();
+                    try {
+                        if (msg.what == 1) {
+                            String text = (String) msg.obj;
+                            if (mWriter != null) {
+                                mWriter.println(text);
+                                mWriter.flush();
+                            }
                         }
+                    } catch (Throwable throwable) {
+                        Log.e("VLocalServerConnect", "send Throwable: ", throwable);
                     }
                 }
             };
@@ -167,21 +175,23 @@ public abstract class VLocalServerConnect extends VLocalWork {
         super.close();
         VLocalWorkPool.instance().removeConnect(mName, mUserId);
         try {
+            if (mAcceptHandler != null) {
+                mAcceptHandler.removeCallbacksAndMessages(null);
+            }
+            if (mSendHandler != null) {
+                mSendHandler.removeCallbacksAndMessages(null);
+            }
             if (mWriter != null) {
                 mWriter.close();
-                mWriter = null;
             }
             if (mReader != null) {
                 mReader.close();
-                mReader = null;
             }
             if (mLocalSocket != null) {
                 mLocalSocket.close();
-                mLocalSocket = null;
             }
             if (mHandlerThread != null) {
                 mHandlerThread.quit();
-                mHandlerThread = null;
             }
         } catch (Throwable throwable) {
             Log.e("VLocalServerConnect", "close Throwable: ", throwable);

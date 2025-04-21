@@ -21,7 +21,7 @@ import java.net.Socket;
 public abstract class VServerConnect extends VWork {
 
     private final int mPort;
-    private Socket mSocket;
+    private final Socket mSocket;
     private Looper mAcceptLooper;
     private Looper mSendLooper;
 
@@ -88,9 +88,13 @@ public abstract class VServerConnect extends VWork {
             mAcceptHandler = new Handler(acceptLooper()) {
                 @Override
                 public void handleMessage(@NonNull Message msg) {
-                    if (msg.what == 1) {
-                        String result = (String) msg.obj;
-                        handleResult(result);
+                    try {
+                        if (msg.what == 1) {
+                            String result = (String) msg.obj;
+                            handleResult(result);
+                        }
+                    } catch (Throwable throwable) {
+                        Log.e("VServerConnect", "getAcceptHandler Throwable: ", throwable);
                     }
                 }
             };
@@ -103,12 +107,16 @@ public abstract class VServerConnect extends VWork {
             mSendHandler = new Handler(sendLooper()) {
                 @Override
                 public void handleMessage(@NonNull Message msg) {
-                    if (msg.what == 1) {
-                        String text = (String) msg.obj;
-                        if (mWriter != null) {
-                            mWriter.println(text);
-                            mWriter.flush();
+                    try {
+                        if (msg.what == 1) {
+                            String text = (String) msg.obj;
+                            if (mWriter != null) {
+                                mWriter.println(text);
+                                mWriter.flush();
+                            }
                         }
+                    } catch (Throwable throwable) {
+                        Log.e("VServerConnect", "getSendHandler Throwable: ", throwable);
                     }
                 }
             };
@@ -197,21 +205,23 @@ public abstract class VServerConnect extends VWork {
         super.close();
         VWorkPool.instance().removeConnect(mName, mUserId);
         try {
+            if(mAcceptHandler != null){
+                mAcceptHandler.removeCallbacksAndMessages(null);
+            }
+            if (mSendHandler != null) {
+                mSendHandler.removeCallbacksAndMessages(null);
+            }
             if (mWriter != null) {
                 mWriter.close();
-                mWriter = null;
             }
             if (mReader != null) {
                 mReader.close();
-                mReader = null;
             }
             if (mSocket != null) {
                 mSocket.close();
-                mSocket = null;
             }
             if (mHandlerThread != null) {
                 mHandlerThread.quit();
-                mHandlerThread = null;
             }
         } catch (Throwable throwable) {
             Log.e("VServerConnect", "close Throwable: ", throwable);

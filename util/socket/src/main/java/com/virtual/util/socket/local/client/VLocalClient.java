@@ -87,9 +87,13 @@ public abstract class VLocalClient extends VLocalWork {
                     mAcceptHandler = new Handler(acceptLooper()) {
                         @Override
                         public void handleMessage(@NonNull Message msg) {
-                            if (msg.what == 1) {
-                                String result = (String) msg.obj;
-                                handleResult(result);
+                            try {
+                                if (msg.what == 1) {
+                                    String result = (String) msg.obj;
+                                    handleResult(result);
+                                }
+                            } catch (Throwable throwable) {
+                                Log.e("VLocalClient", "mAcceptHandler Throwable: ", throwable);
                             }
                         }
                     };
@@ -125,12 +129,16 @@ public abstract class VLocalClient extends VLocalWork {
             mSendHandler = new Handler(sendLooper()) {
                 @Override
                 public void handleMessage(@NonNull Message msg) {
-                    if (msg.what == 1) {
-                        String text = (String) msg.obj;
-                        if (mWriter != null) {
-                            mWriter.println(text);
-                            mWriter.flush();
+                    try {
+                        if (msg.what == 1) {
+                            String text = (String) msg.obj;
+                            if (mWriter != null) {
+                                mWriter.println(text);
+                                mWriter.flush();
+                            }
                         }
+                    } catch (Throwable throwable) {
+                        Log.e("VLocalClient", "send Throwable: ", throwable);
                     }
                 }
             };
@@ -148,21 +156,23 @@ public abstract class VLocalClient extends VLocalWork {
         super.close();
         VLocalWorkClientPool.instance().removeClient(name);
         try {
+            if(mAcceptHandler != null){
+                mAcceptHandler.removeCallbacksAndMessages(null);
+            }
+            if (mSendHandler != null) {
+                mSendHandler.removeCallbacksAndMessages(null);
+            }
             if (mWriter != null) {
                 mWriter.close();
-                mWriter = null;
             }
             if (mReader != null) {
                 mReader.close();
-                mReader = null;
             }
             if (mClientSocket != null) {
                 mClientSocket.close();
-                mClientSocket = null;
             }
             if (mHandlerThread != null) {
                 mHandlerThread.quit();
-                mHandlerThread = null;
             }
         } catch (Throwable throwable) {
             Log.e("VLocalClient", "close Throwable: ", throwable);

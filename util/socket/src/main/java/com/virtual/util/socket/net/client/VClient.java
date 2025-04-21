@@ -79,13 +79,17 @@ public abstract class VClient extends VWork {
             mAcceptHandler = new Handler(acceptLooper()) {
                 @Override
                 public void handleMessage(@NonNull Message msg) {
-                    int what = msg.what;
-                    if (what == HWhat.MESSAGE) {
-                        String result = (String) msg.obj;
-                        handleResult(result);
-                    } else if (what == HWhat.PING_TIMEOUT) {
-                        Log.d("VClient", "ping timeout: " + name());
-                        close();
+                    try {
+                        int what = msg.what;
+                        if (what == HWhat.MESSAGE) {
+                            String result = (String) msg.obj;
+                            handleResult(result);
+                        } else if (what == HWhat.PING_TIMEOUT) {
+                            Log.d("VClient", "ping timeout: " + name());
+                            close();
+                        }
+                    } catch (Throwable throwable) {
+                        Log.e("VClient", "getAcceptHandler Throwable: ", throwable);
                     }
                 }
             };
@@ -98,12 +102,16 @@ public abstract class VClient extends VWork {
             mSendHandler = new Handler(sendLooper()) {
                 @Override
                 public void handleMessage(@NonNull Message msg) {
-                    if (msg.what == HWhat.MESSAGE) {
-                        String text = (String) msg.obj;
-                        if (mWriter != null) {
-                            mWriter.println(text);
-                            mWriter.flush();
+                    try {
+                        if (msg.what == HWhat.MESSAGE) {
+                            String text = (String) msg.obj;
+                            if (mWriter != null) {
+                                mWriter.println(text);
+                                mWriter.flush();
+                            }
                         }
+                    } catch (Throwable throwable) {
+                        Log.e("VClient", "getSendHandler Throwable: ", throwable);
                     }
                 }
             };
@@ -199,21 +207,23 @@ public abstract class VClient extends VWork {
         super.close();
         VWorkClientPool.instance().removeClient(name);
         try {
+            if (mAcceptHandler != null) {
+                mAcceptHandler.removeCallbacksAndMessages(null);
+            }
+            if (mSendHandler != null) {
+                mSendHandler.removeCallbacksAndMessages(null);
+            }
             if (mWriter != null) {
                 mWriter.close();
-                mWriter = null;
             }
             if (mReader != null) {
                 mReader.close();
-                mReader = null;
             }
             if (mSocket != null) {
                 mSocket.close();
-                mSocket = null;
             }
             if (mHandlerThread != null) {
                 mHandlerThread.quit();
-                mHandlerThread = null;
             }
         } catch (Throwable throwable) {
             Log.e("VClient", "close Throwable: ", throwable);
