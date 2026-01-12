@@ -27,6 +27,7 @@ public final class VLogConfig {
 
     private String mSaveRootDir;
     private long mRetainedTime;
+    private IVLog mSaveIVLog = null;
 
     private final List<IVLog> mILogs = new LinkedList<>();
 
@@ -47,6 +48,8 @@ public final class VLogConfig {
     private void setSaveRootDir(String saveRootDir) {
         mSaveRootDir = saveRootDir;
     }
+
+
 
     public void setRetainedTime(long retainedTime) {
         mRetainedTime = retainedTime;
@@ -98,6 +101,14 @@ public final class VLogConfig {
 
     public Context getContext() {
         return mContext;
+    }
+
+    public IVLog getSaveIVLog() {
+        return mSaveIVLog;
+    }
+
+    public void setSaveIVLog(IVLog iLog) {
+        mSaveIVLog = iLog;
     }
 
     public static final class Builder {
@@ -203,6 +214,7 @@ public final class VLogConfig {
                 if (saveLog == null) {
                     saveLog = new VSaveLog(logConfig);
                 }
+                logConfig.setSaveIVLog(saveLog);
                 logConfig.addILog(saveLog);
             }
             if (this.otherILogs != null) {
