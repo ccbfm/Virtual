@@ -65,10 +65,19 @@ public class VWebSocketManager {
     public boolean sendMessage(@NonNull String key, String jsonStr) {
         Builder builder = mWebSocketMap.get(key);
         if (builder == null) {
-            Log.w("VWebSocketManager", "createWebSocket key " + key + " is not exist.");
+            Log.w("VWebSocketManager", "sendMessage key " + key + " is not exist.");
             return false;
         }
         return builder.send(jsonStr);
+    }
+
+    public boolean sendMessageBytes(@NonNull String key, ByteString bytes) {
+        Builder builder = mWebSocketMap.get(key);
+        if (builder == null) {
+            Log.w("VWebSocketManager", "sendMessageBytes key " + key + " is not exist.");
+            return false;
+        }
+        return builder.sendBytes(bytes);
     }
 
     public static class Builder {
@@ -226,7 +235,7 @@ public class VWebSocketManager {
                     if (this.pingScheduled == null) {
                         this.pingScheduled = new ScheduledThreadPoolExecutor(1);
                     }
-                    this.pingScheduled.scheduleAtFixedRate(new Runnable() {
+                    this.pingScheduled.scheduleWithFixedDelay(new Runnable() {
                         @Override
                         public void run() {
                             sendPing();
@@ -294,17 +303,21 @@ public class VWebSocketManager {
 
         private void sendPing() {
             if (this.wsStatus == WsStatus.CONNECTED) {
-                send(true, this.pingString);
+                send(true, null, this.pingString);
             }
         }
 
         public boolean send(String jsonStr) {
-            return send(false, jsonStr);
+            return send(false, null, jsonStr);
         }
 
-        public boolean send(boolean ping, String jsonStr) {
+        public boolean sendBytes(ByteString bytes) {
+            return send(false, bytes, null);
+        }
+
+        public boolean send(boolean ping, ByteString bytes, String jsonStr) {
             if (this.webSocket != null) {
-                if (TextUtils.isEmpty(jsonStr)) {
+                if (TextUtils.isEmpty(jsonStr) && bytes == null) {
                     Log.w("VWebSocketManager", "webSocket send is null.");
                     if (this.wsSendListener != null) {
                         this.wsSendListener.send(false, ping, jsonStr);
@@ -312,7 +325,13 @@ public class VWebSocketManager {
                     return false;
                 }
                 //Log.w("VWebSocketManager", "webSocket send jsonStr: " + jsonStr);
-                boolean result = this.webSocket.send(jsonStr);
+                boolean result;
+                if (bytes != null) {
+                    result = this.webSocket.send(bytes);
+                } else {
+                    result = this.webSocket.send(jsonStr);
+                }
+
                 if (this.wsSendListener != null) {
                     this.wsSendListener.send(result, ping, jsonStr);
                 }
